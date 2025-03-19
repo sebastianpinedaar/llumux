@@ -11,10 +11,7 @@ from dataset.load_data import get_dataloader_from_hf, collect_models, process_in
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
-last_hidden_state_dims = {
-    'bert-base-uncased': 768,
-    'bert-base-cased': 768
-}
+
 
 def pairwise_logistic_loss(scores_i, scores_j, y_ij):
     """

@@ -1,15 +1,7 @@
-from dataset import load_data
-from transformers import BertModel, BertTokenizer
-import torch
+from flr.datasets.pairwise_dataset import PairwiseDataset
+from flr.routers.bert_pairwise.model import BertPairwiseScorer
+from flr.trainer import Trainer
 
-dataloader = load_data.get_dataloader_from_hf(batch_size=2)
-model = BertModel.from_pretrained("bert-base-uncased", torch_dtype=torch.float16, attn_implementation="sdpa")
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-batch = next(iter(dataloader))
-
-prompt = batch["prompt"]
-token = tokenizer(prompt,  return_tensors = 'pt', padding=True)
-prediction = model(**token)
-
-
-#prediction.last_hidden_state.shape = [2, 277, 768]
+if __name__ == "__main__":
+    dataset = PairwiseDataset("lmarena-ai/arena-human-preference-55k", split="train", test_size=0.1, seed=1)
+    trainer = Trainer(model, dataset)

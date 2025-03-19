@@ -11,14 +11,14 @@ LAST_HIDDEN_DIM = {
     'bert-base-cased': 768
 }
 
-class BertScorer(nn.Module):
+class BertPairwiseRouter(nn.Module):
     def __init__(self, unique_models,
                     hidden_size=32, 
                     output_size=1,
                     prompt_embedder_name="bert-base-uncased",
                     loss_fn=pairwise_logistic_loss,
                     device="cuda"):
-        super(BertScorer, self).__init__()
+        super(BertPairwiseRouter, self).__init__()
 
         self.unique_models = unique_models
         self.hidden_size = hidden_size
