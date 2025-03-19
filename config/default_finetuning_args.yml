@@ -1,0 +1,14 @@
+training_args:
+  output_dir : './results'
+  num_train_epochs: 5
+  per_device_train_batch_size : 4
+  per_device_eval_batch_size : 4
+  save_strategy : "no"
+  logging_dir : './logs'
+  eval_strategy: "epoch"
+  report_to: "none"
+
+lora_args:
+  r: 8
+  lora_alpha: 32
+  lora_dropout: 0.

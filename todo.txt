@@ -1,0 +1,14 @@
+- Code for training LLM routers with Bert
+- Code for simple LLM routers using prompt complexity
+- Organize datasets. Use human preference or bert score
+
+- Create a model for embedding LLMs: features, performance metrics, graph embeddings.
+    * Idea for creating embeddings with performance metrics:
+    * NLL on a subset of selected samples, selected by the training data
+
+- predict OOM errors
+- Library with differents
+    * Datasets
+    * Router
+    * Performance Score
+    * Token Cost 

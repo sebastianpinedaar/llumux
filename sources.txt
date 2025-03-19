@@ -1,0 +1,35 @@
+Datasets:
+- https://huggingface.co/datasets/BAAI/JudgeLM-100K
+- https://github.com/lm-sys/FastChat/blob/main/docs/dataset_release.md
+- https://www.kaggle.com/competitions/wsdm-cup-multilingual-chatbot-arena/data
+- https://github.com/sebastianpinedaar/finetuning_text_classifiers/tree/main
+- https://huggingface.co/datasets/llm-blender/mix-instruct?row=0
+- https://github.com/Not-Diamond/awesome-ai-model-routing?tab=readme-ov-file
+- https://github.com/lm-sys/RouteLLM
+
+
+Papers:
+- Prompt to leaderboard: https://arxiv.org/abs/2502.14855
+- RouteLLM: Learning to Route LLMs with Preference Data
+- LLM Blender: Ensembling Large Language Models with Pairwise Ranking and Generative Fusion
+- AutoMix: Automatically Mixing Language Models
+- Hybrid LLM: Cost-Efficient and Quality-Aware Query Routing
+- FrugalGPT: How to use language models while reducing cost and improving performance
+- LLM Cascade with Multiobjective Optimal Consideration
+- Large Language Model Cascades with Mixture of Thought Representations for Cost-Efficient Reasoning
+- Language Model Cascades
+- CascadeBert
+- Tabi: An Efficient Multi-Level Inference Systems for Large Language Models
+- On Optimal Caching and Model Multiplexing for Large Model Inference
+- Efficient Edge Inference by Selective Querying
+- Fly-Swat or Cannon? Cost-effective Language MOdel Choice via Meta-Modeling
+- Scaling LLM Test-Time Compute Optimally can be more effective than scaling model parameters
+
+
+
+
+
+
+
+
+

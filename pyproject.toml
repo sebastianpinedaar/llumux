@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flr"
+version = "0.0.1"
+authors = [
+  { name="Sebastian Pineda", email="sebastianpinedaarango@gmail.com" }
+]
+description = "FLR. Fast LLM Router."
+readme = "README.md"
+requires-python = "==3.10.16"
+dependencies=[
+	"transformers==4.41.0",
+	"torch==2.5.1",
+	"peft==0.11.1",
+    "pandas==2.2.3",
+    "numpy==1.26.4",
+    "huggingface-hub==0.29.2",
+    "datasets==2.19.1",
+    "accelerate==0.31.0"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[tool.hatch.build]
+artifacts = [
+  "*.json",
+  "weights*"
+]
+[tool.hatch.build.targets.wheel]
+packages = ["flr"]
+
+[project.urls]
+"Homepage" = "https://github.com/releaunifreiburg/DeepPipe"
+"Bug Tracker" = "https://github.com/releaunifreiburg/DeepPipe/issues"
