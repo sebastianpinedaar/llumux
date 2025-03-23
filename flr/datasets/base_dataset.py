@@ -1,4 +1,4 @@
-class BaseDataset(Dataset):
+class BaseDataset:
     def __init__(self, dataset_name):
         self.dataset_name = dataset_name
 

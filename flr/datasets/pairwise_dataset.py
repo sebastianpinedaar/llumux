@@ -10,17 +10,27 @@ NUMBER_OF_MODELS = {
 }
 
 class PairwiseDataset(BaseDataset):
-    def __init__(self, dataset_name: str, split: str, test_size: float, seed: int):
+    def __init__(self, dataset_name: str, 
+                 split: str = "train", 
+                 test_size: float = 0.1,
+                 seed: int = 42):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
         self.seed = seed
         self.model_count = None
-        self.dataset = load_dataset(dataset_name, split=split)
-        self.train_val_split = self.dataset.train_test_split(test_size=test_size, seed=seed)
-    
+
+        if dataset_name == "lmarena-ai/arena-human-preference-55k":
+            dataset_before_split = load_dataset(dataset_name)["train"]
+            self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
+        else:
+            raise ValueError(f"Dataset {dataset_name} not supported")
+                             
     def get_number_of_models(self):
         return NUMBER_OF_MODELS[self.dataset_name]
+    
+    def __len__(self):
+        return len(self.dataset)
         
     def __getitem__(self, idx):
         """
@@ -32,40 +42,29 @@ class PairwiseDataset(BaseDataset):
         """
 
         if self.dataset_name == "lmarena-ai/arena-human-preference-55k":
-            item = self.train_val_split[idx]
-            item = item["model_a"], item["model_b"], item["prompt"], \
-                item["winner_model_a"]-1*item["winner_model_b"]
+            item = self.dataset[idx]
+            item = { 
+                "prompt": item["prompt"], \
+                "target": item["winner_model_a"]-1*item["winner_model_b"], \
+                "model_a": item["model_a"],
+                "model_b": item["model_b"]
+            }
+            
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         
-        return item[idx]
+        return item
 
-    def collect_and_count_models(self):
+    def collect_models(self):
         if self.model_count is None:
             models = []
-            for item in next(iter(self.train_val_split)):
-                models.extend(item["model_a"])
-                models.extend(item["model_b"])
+            for item in self.dataset:
+                models.append(item["model_a"])
+                models.append(item["model_b"])
             
             self.model_list = np.unique(models).tolist()
-            self.model_count = len(self.model_list)
 
-        return self.model_list, self.model_count
-
-def get_dataloader_from_hf(
-                    dataset_name: str = "lmarena-ai/arena-human-preference-55k",
-                    model_name: str = "bert-base-cased",
-                    test_size: float = 0.1,
-                    seed: int = 1,
-                    batch_size: float = 32,
-                    split: str = "train"):
-    
-    dataset = load_dataset(dataset_name, split=split)
-    train_val_split = dataset.train_test_split(test_size=test_size, seed=seed)
-    dataloader = torch.utils.data.DataLoader(train_val_split[split], batch_size=batch_size)
-    
-    return dataloader
-
+        return self.model_list
 
 
 if __name__ == "__main__":

@@ -4,23 +4,25 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from transformers import BertModel, BertTokenizer
 
-from ...losses import pairwise_logistic_loss
+from ...losses import PairwiseLogisticLoss
+from ...losses import LOSS_FUNCTIONS
+
 
 LAST_HIDDEN_DIM = {
     'bert-base-uncased': 768,
     'bert-base-cased': 768
 }
 
-class BertPairwiseRouter(nn.Module):
-    def __init__(self, unique_models,
+class BertPairwise(nn.Module):
+    def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     prompt_embedder_name="bert-base-uncased",
-                    loss_fn=pairwise_logistic_loss,
+                    loss_fun="pairwise_logistic_loss",
                     device="cuda"):
-        super(BertPairwiseRouter, self).__init__()
+        super(BertPairwise, self).__init__()
 
-        self.unique_models = unique_models
+        self.model_list = model_list
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.device = device
@@ -31,16 +33,17 @@ class BertPairwiseRouter(nn.Module):
         self.last_hidden_state_dim = LAST_HIDDEN_DIM[prompt_embedder_name]
 
         self.model_encoder = OneHotEncoder()
-        self.model_encoder.fit(np.array(self.unique_models).reshape(-1, 1))
+        self.model_encoder.fit(np.array(self.model_list).reshape(-1, 1))
         self.fc1_prompt = nn.Linear(self.last_hidden_state_dim, hidden_size).to(device)
-        self.fc1_model = nn.Linear(len(self.unique_models), hidden_size).to(device)
+        self.fc1_model = nn.Linear(len(self.model_list), hidden_size).to(device)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
-        self.loss_fn = loss_fn
+        self.loss_fn = LOSS_FUNCTIONS[loss_fun]()
+        self.to(device)
 
-    def forward(self, prompt, model_names_a, model_names_b, target,
+    def forward(self, prompt, target, model_a, model_b,
                 **kwargs):
         tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=512, truncation=True).to(self.device)
         input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
@@ -49,9 +52,9 @@ class BertPairwiseRouter(nn.Module):
                                                 attention_mask=attention_mask)
         prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
         prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
-        score_a = self.score(prompt_embedding, model_names_a)
-        score_b = self.score(prompt_embedding, model_names_b)
-        loss = self.loss_fn((score_a, score_b), target)
+        score_a = self.score(prompt_embedding, model_a)
+        score_b = self.score(prompt_embedding, model_b)
+        loss = self.loss_fn((score_a, score_b), target.to(self.device))
 
         return loss
 
@@ -68,3 +71,23 @@ class BertPairwiseRouter(nn.Module):
 
         return out
 
+    def get_config(self):
+        return {
+            "model_list": self.model_list,
+            "hidden_size": self.hidden_size,
+            "output_size": self.output_size,
+            "prompt_embedder_name": self.prompt_embedder.config.name_or_path,
+            "loss_fun": self.loss_fn.__class__.__name__,
+            "device": self.device
+        }
+
+    @classmethod
+    def from_checkpoint(cls, path):
+        if not path.exists():
+            raise FileNotFoundError(f"Checkpoint file {path} not found.")
+        
+        checkpoint = torch.load(path)
+        model = cls(**checkpoint['config'])  # instantiate with saved config
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.eval()
+        return model

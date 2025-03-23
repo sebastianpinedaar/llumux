@@ -2,7 +2,8 @@
 - Code for simple LLM routers using prompt complexity
 - Organize datasets. Use human preference or bert score
 
-- Create a model for embedding LLMs: features, performance metrics, graph embeddings.
+- Cold start problem:
+    Create a model for embedding LLMs: features, performance metrics, graph embeddings.
     * Idea for creating embeddings with performance metrics:
     * NLL on a subset of selected samples, selected by the training data
 
