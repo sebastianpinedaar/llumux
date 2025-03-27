@@ -1,7 +1,7 @@
 from flr.datasets.pairwise_dataset import PairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
-from flr.scorers.bert_pairwise.scorer import BertPairwise
+from flr.scorers.pairwise.scorer import PairwiseScorer
 from flr.utils import LossTracker, CheckpointSaver
 
 if __name__ == "__main__":
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     callbacks = [LossTracker(),
                  CheckpointSaver(workspace_path=workspace_path)]	
     
-    scorer = BertPairwise(model_list)
+    scorer = PairwiseScorer(model_list)
     trainer_args = TrainerArgs(batch_size=4)
     trainer = Trainer(scorer, trainer_args, train_dataset=train_dataset, 
                       eval_dataset=eval_dataset,
