@@ -2,6 +2,8 @@ import torch
 import logging
 from torch.utils.data import DataLoader
 
+import numpy as np
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -30,6 +32,7 @@ class Trainer:
 
         self.model.train()
         #self.model.to(self.trainer_args.device)
+        eval_loss = np.inf
         iteration_id = 0
         for epoch in range(self.trainer_args.epochs):
             for batch_id, batch in enumerate(self.train_data_loader):
@@ -41,16 +44,17 @@ class Trainer:
                 iteration_id += 1
 
                 if iteration_id % self.trainer_args.eval_freq == 0:
-                    self.evaluate()
+                    eval_loss = self.evaluate()
                     self.model.train()
 
                 for callback in self.callbacks:
                     callback.on_batch_end(iteration_id=iteration_id, 
                                           loss=loss, 
-                                          model=self.model, 
+                                          eval_loss=eval_loss,
+                                          model=self.model,
                                           batch=batch)
-            for callback in self.callbacks:
-                callback.on_epoch_end()
+            #for callback in self.callbacks:
+            #    callback.on_epoch_end()
 
     def evaluate(self):
         

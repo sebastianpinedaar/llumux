@@ -2,6 +2,8 @@ import torch
 import logging
 from pathlib import Path
 
+import numpy as np
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,7 @@ class CheckpointSaver:
         self.checkpoint_dir = checkpoint_dir
         self.full_checkpoint_dir = self.workspace_path / checkpoint_dir
         self.full_checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        self.best_loss = np.inf
 
     def on_batch_end(self, iteration_id, model, **kwargs):
         logger.info(f"Saving checkpoint for epoch {iteration_id}.")
@@ -28,3 +31,11 @@ class CheckpointSaver:
                 'config': model.get_config(),
                 'model_state_dict': model.state_dict(),
             }, self.full_checkpoint_dir / self.checkpoint_name)
+
+        if kwargs["eval_loss"] < self.best_loss:
+            self.best_loss = kwargs["eval_loss"]
+            torch.save({
+                'config': model.get_config(),
+                'model_state_dict': model.state_dict(),
+            }, self.full_checkpoint_dir / ("best_" + self.checkpoint_name ))
+     

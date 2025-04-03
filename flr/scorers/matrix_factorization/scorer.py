@@ -4,13 +4,13 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from transformers import BertModel, BertTokenizer
 
-from ...losses import PairwiseLogisticLoss
 from ...losses import LOSS_FUNCTIONS
 
 
 LAST_HIDDEN_DIM = {
     'bert-base-uncased': 768,
-    'bert-base-cased': 768
+    'bert-base-cased': 768,
+    'identity': 768
 }
 
 class MatrixFactorizationScorer(nn.Module):
@@ -19,6 +19,7 @@ class MatrixFactorizationScorer(nn.Module):
                     output_size=1,
                     prompt_embedder_name="bert-base-uncased",
                     loss_fun="pairwise_cross_entropy",
+                    max_length=512,
                     device="cuda"):
         super(MatrixFactorizationScorer, self).__init__()
 
@@ -26,29 +27,43 @@ class MatrixFactorizationScorer(nn.Module):
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.device = device
-        self.prompt_embedder = BertModel.from_pretrained(prompt_embedder_name, 
-                                                         torch_dtype=torch.float32, 
-                                                         attn_implementation="sdpa").to(device)
-        self.prompt_tokenizer = BertTokenizer.from_pretrained(prompt_embedder_name)
+        self.max_length = max_length
         self.last_hidden_state_dim = LAST_HIDDEN_DIM[prompt_embedder_name]
-
-        self.model_encoder = OneHotEncoder()
+        self.prompt_embedder_name = prompt_embedder_name
+        self.model_encoder = OneHotEncoder(handle_unknown="ignore")
         self.model_encoder.fit(np.array(self.model_list).reshape(-1, 1))
         self.fc1_prompt = nn.Linear(self.last_hidden_state_dim, hidden_size).to(device)
         self.fc1_model = nn.Linear(len(self.model_list), hidden_size).to(device)
         self.fc2 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)       
         self.loss_fn = LOSS_FUNCTIONS[loss_fun]()
+        self.initialize_prompt_embedder()
         self.to(device)
+
+    def initialize_prompt_embedder(self):
+        if self.prompt_embedder_name == "bert-base-uncased":
+            self.prompt_embedder = BertModel.from_pretrained(self.prompt_embedder_name, 
+                                                            torch_dtype=torch.float32, 
+                                                            attn_implementation="sdpa").to(device)
+            self.prompt_tokenizer = BertTokenizer.from_pretrained(self.prompt_embedder_name)
+        elif self.prompt_embedder_name == "identity":
+            pass
+
+    def get_prompt_embedding(self, prompt):
+        if self.prompt_embedder_name == "bert-base-uncased":
+            tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=self.max_length, truncation=True).to(self.device)
+            input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
+            prompt_embedding = self.prompt_embedder(input_ids=input_ids,
+                                                    token_type_ids=token_type_ids,
+                                                    attention_mask=attention_mask)
+            prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
+        elif self.prompt_embedder_name == "identity":
+            prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
+        return prompt_embedding
 
     def forward(self, prompt, target, model_a, model_b,
                 **kwargs):
-        tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=512, truncation=True).to(self.device)
-        input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
-        prompt_embedding = self.prompt_embedder(input_ids=input_ids,
-                                                token_type_ids=token_type_ids,
-                                                attention_mask=attention_mask)
-        prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
+        prompt_embedding = self.get_prompt_embedding(prompt)
         prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
         score_a = self.score(prompt_embedding, model_a)
         score_b = self.score(prompt_embedding, model_b)
@@ -72,7 +87,7 @@ class MatrixFactorizationScorer(nn.Module):
             "model_list": self.model_list,
             "hidden_size": self.hidden_size,
             "output_size": self.output_size,
-            "prompt_embedder_name": self.prompt_embedder.config.name_or_path,
+            "prompt_embedder_name": self.prompt_embedder_name,
             "loss_fun": self.loss_fn.__class__.__name__,
             "device": self.device
         }
