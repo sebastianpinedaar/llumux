@@ -18,6 +18,7 @@ class PairwiseLogisticLoss:
         """
         assert len(scores) == 2
         scores_i, scores_j = scores
-        margin = scores_i - scores_j  # Difference in scores
-        loss = torch.log(1 + torch.exp(-(y_ij+self.epsilon) * margin.reshape(-1)))  # Logistic loss
-        return loss.mean()  #
+        margin = (scores_i - scores_j).reshape(-1)  # Difference in scores
+        loss = torch.log(1 + torch.exp(-y_ij[y_ij!=0] * margin[y_ij!=0]))
+        loss2 = self.epsilon * torch.abs(margin[y_ij==0])  # Logistic loss
+        return loss.mean() + loss2.mean()  #

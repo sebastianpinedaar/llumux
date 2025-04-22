@@ -18,6 +18,7 @@ class PairwiseScorer(nn.Module):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
+                    max_length=512,
                     prompt_embedder_name="bert-base-uncased",
                     loss_fun="pairwise_logistic_loss",
                     device="cuda"):
@@ -28,12 +29,13 @@ class PairwiseScorer(nn.Module):
         self.output_size = output_size
         self.device = device
         self.prompt_embedder_name = prompt_embedder_name
+        self.max_length = max_length
         self.last_hidden_state_dim = LAST_HIDDEN_DIM[prompt_embedder_name]
         self.model_encoder = OneHotEncoder(handle_unknown="ignore")
         self.model_encoder.fit(np.array(self.model_list).reshape(-1, 1))
         self.fc1_prompt = nn.Linear(self.last_hidden_state_dim, hidden_size).to(device)
         self.fc1_model = nn.Linear(len(self.model_list), hidden_size).to(device)
-        self.relu = nn.ReLU()
+        self.relu = nn.LeakyReLU()
         self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
@@ -42,6 +44,9 @@ class PairwiseScorer(nn.Module):
 
         self.to(device)
 
+    def freeze_backbone(self):
+        for param in self.prompt_embedder.parameters():
+            param.requires_grad = False
 
     def initialize_prompt_embedder(self):
         if self.prompt_embedder_name == "bert-base-uncased":
@@ -67,7 +72,7 @@ class PairwiseScorer(nn.Module):
     def forward(self, prompt, target, model_a, model_b,
                 **kwargs):
         prompt_embedding = self.get_prompt_embedding(prompt)
-        #prompt_embedding = self.ln1(prompt_embedding)
+        prompt_embedding = self.ln1(prompt_embedding)
         prompt_embedding = self.fc1_prompt(prompt_embedding)
         score_a = self.score(prompt_embedding, model_a)
         score_b = self.score(prompt_embedding, model_b)

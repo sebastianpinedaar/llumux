@@ -6,6 +6,7 @@ Datasets:
 - https://huggingface.co/datasets/llm-blender/mix-instruct?row=0
 - https://github.com/Not-Diamond/awesome-ai-model-routing?tab=readme-ov-file
 - https://github.com/lm-sys/RouteLLM
+- https://lmsys.org/projects/
 
 
 Papers:

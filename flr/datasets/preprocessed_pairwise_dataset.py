@@ -12,6 +12,14 @@ NUMBER_OF_MODELS = {
 }
 
 
+def preprocess(item, dataset):
+    new_item = {}
+    new_item["prompt"] = dataset.get_embeddings(item["prompt"])  
+    new_item["model_a"] = item["model_a"]
+    new_item["model_b"] = item["model_b"]
+    new_item["target"] = [x_a-1*x_b for x_a, x_b in zip(item["winner_model_a"], item["winner_model_b"])]
+    return new_item
+
 class PreprocessedPairwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
@@ -33,20 +41,14 @@ class PreprocessedPairwiseDataset(BaseDataset):
         if dataset_name == "lmarena-ai/arena-human-preference-55k":
             dataset_before_split = load_dataset(dataset_name)["train"]
             dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
-            self.dataset = dataset.map(self.preprocess, batched=True, batch_size=32)
-            self.dataset.save_to_disk(dataset_name + f"-preprocessed-{split}")
+            self.dataset = dataset.map(lambda x: preprocess(x, self), batched=True, batch_size=32)
+            self.dataset.save_to_disk("workspace/"+ dataset_name + f"-preprocessed-{split}")
         elif dataset_name == "lmarena-ai/arena-human-preference-55k-preprocessed":
-            self.dataset = load_from_disk(dataset_name+"-"+split)
+            self.dataset = load_from_disk("workspace/"+dataset_name+"-"+split)
         else:
             raise ValueError(f"Dataset {dataset_name} not supported")
 
-    def preprocess(self, item):
-        new_item = {}
-        new_item["prompt"] = self.get_embeddings(item["prompt"])  
-        new_item["model_a"] = item["model_a"]
-        new_item["model_b"] = item["model_b"]
-        new_item["target"] = [x_a-1*x_b for x_a, x_b in zip(item["winner_model_a"], item["winner_model_b"])]
-        return new_item
+
 
     def get_embeddings(self, prompt):
         with torch.no_grad():

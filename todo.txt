@@ -1,3 +1,8 @@
+- Include the other model in routellm
+- Test training in other datasets
+- Create my own dataset
+
+
 - Code for training LLM routers with Bert
 - Code for simple LLM routers using prompt complexity
 - Organize datasets. Use human preference or bert score
@@ -13,3 +18,5 @@
     * Router
     * Performance Score
     * Token Cost 
+
+- https://github.com/Portkey-AI/gateway
