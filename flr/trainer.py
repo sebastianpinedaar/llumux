@@ -35,7 +35,7 @@ class Trainer:
         eval_loss = np.inf
         iteration_id = 0
         for epoch in range(self.trainer_args.epochs):
-            for batch_id, batch in enumerate(self.train_data_loader):
+            for batch in self.train_data_loader:
                 self.model.zero_grad()
                 loss = self.model(**batch)
                 loss.backward()
@@ -61,7 +61,7 @@ class Trainer:
         self.model.eval()
         losses = []	
         with torch.no_grad():
-            for batch in self.eval_data_loader:
+            for batch_id, batch in enumerate(self.eval_data_loader):
                 loss = self.model(**batch)
                 losses.append(loss.item())
         avg_loss = sum(losses) / len(losses)

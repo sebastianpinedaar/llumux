@@ -21,4 +21,6 @@ class PairwiseLogisticLoss:
         margin = (scores_i - scores_j).reshape(-1)  # Difference in scores
         loss = torch.log(1 + torch.exp(-y_ij[y_ij!=0] * margin[y_ij!=0]))
         loss2 = self.epsilon * torch.abs(margin[y_ij==0])  # Logistic loss
+        if loss2.shape[0] == 0:
+            loss2 = torch.tensor(0.0).to(loss.device)
         return loss.mean() + loss2.mean()  #

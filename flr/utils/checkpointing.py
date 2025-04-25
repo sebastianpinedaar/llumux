@@ -24,7 +24,6 @@ class CheckpointSaver:
         self.best_loss = np.inf
 
     def on_batch_end(self, iteration_id, model, **kwargs):
-        logger.info(f"Saving checkpoint for epoch {iteration_id}.")
 
         if iteration_id % self.freq == 0:
             torch.save({
@@ -33,6 +32,8 @@ class CheckpointSaver:
             }, self.full_checkpoint_dir / self.checkpoint_name)
 
         if kwargs["eval_loss"] < self.best_loss:
+            logger.info(f"Saving checkpoint for epoch {iteration_id}.")
+
             self.best_loss = kwargs["eval_loss"]
             torch.save({
                 'config': model.get_config(),

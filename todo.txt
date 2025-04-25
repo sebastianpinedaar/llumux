@@ -1,7 +1,7 @@
 - Include the other model in routellm
 - Test training in other datasets
 - Create my own dataset
-
+- Safe the model names
 
 - Code for training LLM routers with Bert
 - Code for simple LLM routers using prompt complexity

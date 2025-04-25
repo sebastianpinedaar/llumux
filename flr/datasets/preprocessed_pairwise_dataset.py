@@ -100,9 +100,9 @@ class PreprocessedPairwiseDataset(BaseDataset):
         return item
 
     def collect_models(self):
-        if self.model_count is None:
+        if self.model_list is None:
             models = []
-            for item in self.dataset:
+            for item in iter(self):
                 models.append(item["model_a"])
                 models.append(item["model_b"])
             
