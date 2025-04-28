@@ -1,6 +1,5 @@
 
 from datasets import load_dataset
-import torch
 import numpy as np
 
 from .base_dataset import BaseDataset

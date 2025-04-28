@@ -3,6 +3,8 @@ import torch.nn as nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from transformers import BertModel, BertTokenizer
+from transformers import AlbertTokenizer, AlbertForSequenceClassification
+from transformers import AlbertModel
 
 from ...losses import PairwiseLogisticLoss
 from ...losses import LOSS_FUNCTIONS
@@ -11,6 +13,7 @@ from ...losses import LOSS_FUNCTIONS
 LAST_HIDDEN_DIM = {
     'bert-base-uncased': 768,
     'bert-base-cased': 768,
+    'albert-base-v2': 768,	
     'identity': 768
 }
 
@@ -54,11 +57,16 @@ class PairwiseScorer(nn.Module):
                                                             torch_dtype=torch.float32, 
                                                             attn_implementation="sdpa").to(self.device)
             self.prompt_tokenizer = BertTokenizer.from_pretrained(self.prompt_embedder_name)
+        elif self.prompt_embedder_name == "albert-base-v2":
+            self.prompt_embedder = AlbertModel.from_pretrained(self.prompt_embedder_name, 
+                                                              torch_dtype=torch.float32).to(self.device)
+            self.prompt_tokenizer = AlbertTokenizer.from_pretrained(self.prompt_embedder_name)
+
         elif self.prompt_embedder_name == "identity":
             pass
 
     def get_prompt_embedding(self, prompt):
-        if self.prompt_embedder_name == "bert-base-uncased":
+        if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
             tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=self.max_length, truncation=True).to(self.device)
             input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
             prompt_embedding = self.prompt_embedder(input_ids=input_ids,
