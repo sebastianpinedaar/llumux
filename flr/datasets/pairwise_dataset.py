@@ -71,7 +71,7 @@ class PairwiseDataset(BaseDataset):
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": -np.sign(item["candidates"][model_a]["scores"]["logprobs"]-item["candidates"][model_b]["scores"]["logprobs"]).item(), \
+                "target": -np.sign(item["candidates"][model_a]["scores"]["bertscore"]-item["candidates"][model_b]["scores"]["bertscore"]).item(), \
                 "model_a": item["candidates"][model_a]["model"],
                 "model_b": item["candidates"][model_b]["model"]
             } 

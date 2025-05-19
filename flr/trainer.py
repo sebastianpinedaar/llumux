@@ -37,7 +37,7 @@ class Trainer:
         for epoch in range(self.trainer_args.epochs):
             for batch in self.train_data_loader:
                 self.model.zero_grad()
-                loss = self.model(**batch)
+                _, loss = self.model(**batch)
                 loss.backward()
                 optimizer.step()
 
@@ -62,7 +62,7 @@ class Trainer:
         losses = []	
         with torch.no_grad():
             for batch_id, batch in enumerate(self.eval_data_loader):
-                loss = self.model(**batch)
+                _, loss = self.model(**batch)
                 losses.append(loss.item())
         avg_loss = sum(losses) / len(losses)
         logger.info(f"Avg eval loss: {avg_loss}")

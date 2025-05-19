@@ -5,8 +5,9 @@ from sklearn.preprocessing import OneHotEncoder
 from transformers import BertModel, BertTokenizer
 from transformers import AlbertTokenizer, AlbertForSequenceClassification
 from transformers import AlbertModel
-from ...losses import LOSS_FUNCTIONS
 
+from ...losses import LOSS_FUNCTIONS
+from ..base_scorer import BaseScorer
 
 LAST_HIDDEN_DIM = {
     'bert-base-uncased': 768,
@@ -15,12 +16,12 @@ LAST_HIDDEN_DIM = {
     'identity': 768
 }
 
-class MatrixFactorizationScorer(nn.Module):
+class MatrixFactorizationScorer(BaseScorer):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     prompt_embedder_name="bert-base-uncased",
-                    loss_fun="pairwise_cross_entropy",
+                    loss_fun_name="pairwise_cross_entropy",
                     max_length=512,
                     device="cuda"):
         super(MatrixFactorizationScorer, self).__init__()
@@ -37,10 +38,15 @@ class MatrixFactorizationScorer(nn.Module):
         self.fc1_prompt = nn.Linear(self.last_hidden_state_dim, hidden_size).to(device)
         self.fc1_model = nn.Linear(len(self.model_list), hidden_size).to(device)
         self.fc2 = nn.Linear(hidden_size, output_size).to(device)
-        self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)       
-        self.loss_fn = LOSS_FUNCTIONS[loss_fun]()
+        self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
+        self.loss_fun_name = loss_fun_name   
+        self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
         self.initialize_prompt_embedder()
         self.to(device)
+
+    def freeze_backbone(self):
+        for param in self.prompt_embedder.parameters():
+            param.requires_grad = False
 
     def initialize_prompt_embedder(self):
         if self.prompt_embedder_name == "bert-base-uncased":
@@ -69,16 +75,23 @@ class MatrixFactorizationScorer(nn.Module):
             raise ValueError(f"Prompt embedder {self.prompt_embedder_name} not supported")
         return prompt_embedding
 
-    def forward(self, prompt, target, model_a, model_b,
+    def forward(self, prompt, model=None, target=None, model_a=None, model_b=None,
                 **kwargs):
-        prompt_embedding = self.get_prompt_embedding(prompt)
-        prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
-        score_a = self.score(prompt_embedding, model_a)
-        score_b = self.score(prompt_embedding, model_b)
-        loss = self.loss_fn((score_a, score_b), target.to(self.device))
+        if model is None:
+            assert model_a is not None and model_b is not None, "model_a and model_b must be provided if model is None"
+            prompt_embedding = self.get_prompt_embedding(prompt)
+            prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
+            score_a = self.score(prompt_embedding, model_a)
+            score_b = self.score(prompt_embedding, model_b)
+            loss = self.loss_fn((score_a, score_b), target.to(self.device))
+            return (score_a, score_b), loss
 
-        return loss
-
+        else:
+            prompt_embedding = self.get_prompt_embedding(prompt)
+            prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
+            score = self.score(prompt_embedding, model)
+            return score, loss
+        
     def score(self, prompt_embedding, model_names):
         model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
         model_encoding = torch.tensor(model_encoding).to(self.device).float()
@@ -89,24 +102,13 @@ class MatrixFactorizationScorer(nn.Module):
         out = self.fc2(x)
 
         return out
-
+    
     def get_config(self):
         return {
             "model_list": self.model_list,
             "hidden_size": self.hidden_size,
             "output_size": self.output_size,
             "prompt_embedder_name": self.prompt_embedder_name,
-            "loss_fun": self.loss_fn.__class__.__name__,
+            "loss_fun": self.loss_fun_name,
             "device": self.device
         }
-
-    @classmethod
-    def from_checkpoint(cls, path):
-        if not path.exists():
-            raise FileNotFoundError(f"Checkpoint file {path} not found.")
-        
-        checkpoint = torch.load(path)
-        model = cls(**checkpoint['config'])  # instantiate with saved config
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()
-        return model

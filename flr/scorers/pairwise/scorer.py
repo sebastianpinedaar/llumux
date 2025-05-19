@@ -8,6 +8,7 @@ from transformers import AlbertModel
 
 from ...losses import PairwiseLogisticLoss
 from ...losses import LOSS_FUNCTIONS
+from ..base_scorer import BaseScorer
 
 
 LAST_HIDDEN_DIM = {
@@ -17,13 +18,13 @@ LAST_HIDDEN_DIM = {
     'identity': 768
 }
 
-class PairwiseScorer(nn.Module):
+class PairwiseScorer(BaseScorer):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     max_length=512,
                     prompt_embedder_name="bert-base-uncased",
-                    loss_fun="pairwise_logistic_loss",
+                    loss_fun_name="pairwise_logistic_loss",
                     device="cuda"):
         super(PairwiseScorer, self).__init__()
 
@@ -42,7 +43,8 @@ class PairwiseScorer(nn.Module):
         self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
-        self.loss_fn = LOSS_FUNCTIONS[loss_fun]()
+        self.loss_fun_name = loss_fun_name
+        self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
         self.initialize_prompt_embedder()
 
         self.to(device)
@@ -107,17 +109,6 @@ class PairwiseScorer(nn.Module):
             "hidden_size": self.hidden_size,
             "output_size": self.output_size,
             "prompt_embedder_name": self.prompt_embedder_name,
-            "loss_fun": self.loss_fn.__class__.__name__,
+            "loss_fun_name": self.loss_fun_name,
             "device": self.device
         }
-
-    @classmethod
-    def from_checkpoint(cls, path):
-        if not path.exists():
-            raise FileNotFoundError(f"Checkpoint file {path} not found.")
-        
-        checkpoint = torch.load(path)
-        model = cls(**checkpoint['config'])  # instantiate with saved config
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()
-        return model

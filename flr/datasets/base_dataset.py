@@ -36,7 +36,7 @@ class BaseDataset:
     
     def __len__(self):
         if self.random_sample:
-            return self.fixed_len if self.split == "train" else 100
+            return self.fixed_len if self.split == "train" else 1000
         elif self.dataset_name == "lmarena-ai/arena-human-preference-55k":
             return len(self.dataset)
         elif self.dataset_name == "llm-blender/mix-instruct":

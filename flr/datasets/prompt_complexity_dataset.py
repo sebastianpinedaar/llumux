@@ -3,7 +3,7 @@ import numpy as np
 from .base_dataset import BaseDataset
 from .base_dataset import NUMBER_OF_MODELS
 
-class PointwiseDataset(BaseDataset):
+class PromptComplexityDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
@@ -30,7 +30,7 @@ class PointwiseDataset(BaseDataset):
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": item["candidates"][model_id]["scores"]["bertscore"],
+                "target": len(item["candidates"][model_id]["text"])/1000,
                 "model": item["candidates"][model_id]["model"]
             } 
         else:

@@ -9,15 +9,15 @@ from transformers import AlbertModel
 from ...losses import PairwiseLogisticLoss
 from ...losses import LOSS_FUNCTIONS
 
-from ..base_scorer import LAST_HIDDEN_DIM
+from ..base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
-class PointwiseScorer(nn.Module):
+class PointwiseScorer(BaseScorer):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     max_length=512,
                     prompt_embedder_name="bert-base-uncased",
-                    loss_fun="pairwise_logistic_loss",
+                    loss_fun_name="pairwise_logistic_loss",
                     device="cuda"):
         super(PointwiseScorer, self).__init__()
 
@@ -36,14 +36,10 @@ class PointwiseScorer(nn.Module):
         self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
-        self.loss_fn = LOSS_FUNCTIONS[loss_fun]()
+        self.loss_fun_name = loss_fun_name
+        self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
         self.initialize_prompt_embedder()
-
         self.to(device)
-
-    def freeze_backbone(self):
-        for param in self.prompt_embedder.parameters():
-            param.requires_grad = False
 
     def initialize_prompt_embedder(self):
         if self.prompt_embedder_name == "bert-base-uncased":
@@ -72,14 +68,17 @@ class PointwiseScorer(nn.Module):
             prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
         return prompt_embedding
 
-    def forward(self, prompt, target, model,  **kwargs):
+    def forward(self, prompt, model, target = None, **kwargs):
         prompt_embedding = self.get_prompt_embedding(prompt)
         prompt_embedding = self.ln1(prompt_embedding)
         prompt_embedding = self.fc1_prompt(prompt_embedding)
         score = self.score(prompt_embedding, model)
-        loss = self.loss_fn(score.reshape(-1), target.to(self.device).float())
 
-        return loss
+        if target is not None:
+            loss = self.loss_fn(score.reshape(-1), target.to(self.device).float())
+        else:
+            loss = None
+        return score, loss
 
     def score(self, prompt_embedding, model_names):
         model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
@@ -93,6 +92,7 @@ class PointwiseScorer(nn.Module):
         out = self.fc3(out)
 
         return out
+    
 
     def get_config(self):
         return {
@@ -100,17 +100,6 @@ class PointwiseScorer(nn.Module):
             "hidden_size": self.hidden_size,
             "output_size": self.output_size,
             "prompt_embedder_name": self.prompt_embedder_name,
-            "loss_fun": self.loss_fn.__class__.__name__,
+            "loss_fun_name": self.loss_fun_name,
             "device": self.device
         }
-
-    @classmethod
-    def from_checkpoint(cls, path):
-        if not path.exists():
-            raise FileNotFoundError(f"Checkpoint file {path} not found.")
-        
-        checkpoint = torch.load(path)
-        model = cls(**checkpoint['config'])  # instantiate with saved config
-        model.load_state_dict(checkpoint['model_state_dict'])
-        model.eval()
-        return model

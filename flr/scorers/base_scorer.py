@@ -1,3 +1,5 @@
+import torch
+import torch.nn as nn
 from ..hub.model_hub import ModelHub
 
 LAST_HIDDEN_DIM = {
@@ -7,11 +9,10 @@ LAST_HIDDEN_DIM = {
     'identity': 768
 }
 
-class BaseScorer:   
+class BaseScorer(nn.Module):   
     def __init__(self, 
-                    model_hub: ModelHub,
                    **kwargs):
-        self.model_hub = model_hub
+        super(BaseScorer, self).__init__()
 
     def score(self, prompt: str):
         """
@@ -22,4 +23,13 @@ class BaseScorer:
             """
         raise NotImplementedError
 
-
+    @classmethod
+    def from_checkpoint(cls, path):
+        if not path.exists():
+            raise FileNotFoundError(f"Checkpoint file {path} not found.")
+        
+        checkpoint = torch.load(path)
+        model = cls(**checkpoint['config'])  # instantiate with saved config
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.eval()
+        return model
