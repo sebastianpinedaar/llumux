@@ -53,19 +53,6 @@ class PairwiseScorer(BaseScorer):
         for param in self.prompt_embedder.parameters():
             param.requires_grad = False
 
-    def initialize_prompt_embedder(self):
-        if self.prompt_embedder_name == "bert-base-uncased":
-            self.prompt_embedder = BertModel.from_pretrained(self.prompt_embedder_name, 
-                                                            torch_dtype=torch.float32, 
-                                                            attn_implementation="sdpa").to(self.device)
-            self.prompt_tokenizer = BertTokenizer.from_pretrained(self.prompt_embedder_name)
-        elif self.prompt_embedder_name == "albert-base-v2":
-            self.prompt_embedder = AlbertModel.from_pretrained(self.prompt_embedder_name, 
-                                                              torch_dtype=torch.float32).to(self.device)
-            self.prompt_tokenizer = AlbertTokenizer.from_pretrained(self.prompt_embedder_name)
-
-        elif self.prompt_embedder_name == "identity":
-            pass
 
     def get_prompt_embedding(self, prompt):
         if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:

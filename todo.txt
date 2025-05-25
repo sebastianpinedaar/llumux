@@ -1,19 +1,13 @@
-- Create point wise loss
 - Create listwise loss
+- Create lis-scorer and list-dataset
 - Safe the model names to avoid the initial model name colleciton
-- Cerate measure of performance saved by using the routers (as in the paper)
 - Test long training in other infrastructure (maybe colab)
-- Model checkpointing
-- Router that balances efficiemcy
-- Efficiency score
 
 - Create a table with prompt-model and learn a portfolio- > learn a set of good initial portfolio
 - Select the most difficult samples, to use as portfolio for selecting the model
-- Create my own dataset
+- Create my own dataset usinng prompt portfolio to evaluate on ChatGPT, Gemini, Claude, Grok
 
-
-- Code for training LLM routers with Bert
-- Code for simple LLM routers using prompt complexity
+- select from multiple maximums int he router
 - Organize datasets. Use human preference or bert score
 
 - Cold start problem:

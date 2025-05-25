@@ -54,7 +54,7 @@ class RatioRouter:
                     "model": model_candidates
                 }
                 profiler_out = self.profiler(**input)[0].cpu().numpy().reshape(-1, 1)
-                scorer_out = self.scorer(**input).cpu().numpy().reshape(-1, 1)
+                scorer_out = self.scorer(**input)[0].cpu().numpy().reshape(-1, 1)
                 results_profiler.append(profiler_out)
                 results_scorer.append(scorer_out)
         results_profiler = np.concatenate(results_profiler, axis=1)

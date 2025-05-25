@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     #scorer = PointwiseScorer.from_checkpoint(Path("workspace/complexity_pred/checkpoints/best_checkpoint.pt"))
     profiler = PointwiseScorer.from_checkpoint(Path("workspace/pref_pred/checkpoints/best_checkpoint.pt"))
-    scorer = MatrixFactorizationScorer.from_checkpoint(Path("workspaces/test/checkpoints/best_checkpoint.pt"))
+    scorer = MatrixFactorizationScorer.from_checkpoint(Path("workspace/test/checkpoints/best_checkpoint.pt"))
 
     evaluator_args = EvaluatorArgs(batch_size=batch_size)
 
