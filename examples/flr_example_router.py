@@ -1,16 +1,16 @@
 import argparse
 from pathlib import Path
-from flr.scorers.pointwise.scorer import PointwiseScorer
-from flr.profiler.complexity_pred import ComplexityPredictor
+from flr.scorers.pointwise_scorer import PointwiseScorer
+from flr.scorers.complexity_scorer import ComplexityPredictor
 from flr.datasets.pointwise_dataset import PointwiseDataset
-from flr.scorers.matrix_factorization.scorer import MatrixFactorizationScorer
+from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
 from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset
 from flr.datasets.route_dataset import RouteDataset
 from flr.routers.ratio_router import RatioRouter
 from flr.routers.greedy_router import GreedyRouter
 from flr.routers.random_router import RandomRouter
-from flr.evaluator import RouterEvaluator
-from flr.evaluator_args import EvaluatorArgs
+from flr.router_evaluator import RouterEvaluator
+from flr.router_evaluator_args import RouterEvaluatorArgs
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Train a pairwise ranking model.")
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     profiler = PointwiseScorer.from_checkpoint(Path("workspace/pref_pred/checkpoints/best_checkpoint.pt"))
     scorer = MatrixFactorizationScorer.from_checkpoint(Path("workspace/test/checkpoints/best_checkpoint.pt"))
 
-    evaluator_args = EvaluatorArgs(batch_size=batch_size)
+    evaluator_args = RouterEvaluatorArgs(batch_size=batch_size)
 
     for strength in [0, 0.25, 0.5]:
         print(f"Evaluating with strength {strength}")

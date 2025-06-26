@@ -1,26 +1,23 @@
-- Create listwise loss
-- Create lis-scorer and list-dataset
+Before release
+- Generalize/factorize scorer, specially the MatrixMultiplicationScorer
 - Safe the model names to avoid the initial model name colleciton
-- Test long training in other infrastructure (maybe colab)
 
+- Create listwise loss
+- Create lis-scorer and list-dataset, listwise loss
+- Explanation of structure - docs
+- Fix the formate of the route dataset
+- Test long training in other infrastructure (maybe colab, runpod)
+- Example of how to finetune with new data
+
+Future
 - Create a table with prompt-model and learn a portfolio- > learn a set of good initial portfolio
 - Select the most difficult samples, to use as portfolio for selecting the model
+- Evaluate hte prompt portfolio in a heldout mllm
+- Connection to other LLMs
+
+RoutingLLMs
 - Create my own dataset usinng prompt portfolio to evaluate on ChatGPT, Gemini, Claude, Grok
 
-- select from multiple maximums int he router
-- Organize datasets. Use human preference or bert score
-
-- Cold start problem:
-    Create a model for embedding LLMs: features, performance metrics, graph embeddings.
-    * Idea for creating embeddings with performance metrics:
-    * NLL on a subset of selected samples, selected by the training data
-
-- predict OOM errors
-- Library with differents
-    * Datasets
-    * Router
-    * Performance Score
-    * Token Cost 
 
 - https://github.com/Portkey-AI/gateway
 - https://www.runpod.io/pricing  : V100 seems to be a good option

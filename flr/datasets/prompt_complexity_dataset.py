@@ -9,8 +9,23 @@ class PromptComplexityDataset(BaseDataset):
                  test_size: float = 0.1,
                  seed: int = 42,
                  random_sample: bool = False,
-                 model_list: list = None):
+                 model_list: list = None,
+                 target_scale: int = 1000,
+                 complexizy_type: str = "length"):
         super().__init__(dataset_name, split, test_size, seed, random_sample, model_list)
+        self.target_scale = target_scale
+        self.complexity_type = complexizy_type
+    
+    def get_prompt_complexity(self, prompt: str):
+        """
+        Calculate the complexity of the prompt based on the specified complexity type.
+        """
+        if self.complexity_type == "length":
+            return len(prompt) / self.target_scale
+        elif self.complexity_type == "word_count":
+            return len(prompt.split()) / self.target_scale
+        else:
+            raise ValueError(f"Complexity type {self.complexity_type} not supported")
         
     def __getitem__(self, idx):
         """
@@ -22,15 +37,12 @@ class PromptComplexityDataset(BaseDataset):
         if self.random_sample:
             idx = np.random.randint(0, len(self.dataset))
         
-        if self.dataset_name == "lmarena-ai/arena-human-preference-55k":
-            raise NotImplementedError("PointwiseDataset is not implemented for lmarena-ai/arena-human-preference-55k dataset")
-        
-        elif self.dataset_name == "llm-blender/mix-instruct":
+        if self.dataset_name == "llm-blender/mix-instruct":
             model_id = np.random.randint(0, NUMBER_OF_MODELS[self.dataset_name])
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": len(item["candidates"][model_id]["text"])/1000,
+                "target": self.get_prompt_complexity(item["candidates"][model_id]["text"]),
                 "model": item["candidates"][model_id]["model"]
             } 
         else:

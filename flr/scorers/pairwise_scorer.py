@@ -6,17 +6,9 @@ from transformers import BertModel, BertTokenizer
 from transformers import AlbertTokenizer, AlbertForSequenceClassification
 from transformers import AlbertModel
 
-from ...losses import PairwiseLogisticLoss
-from ...losses import LOSS_FUNCTIONS
-from ..base_scorer import BaseScorer
-
-
-LAST_HIDDEN_DIM = {
-    'bert-base-uncased': 768,
-    'bert-base-cased': 768,
-    'albert-base-v2': 768,	
-    'identity': 768
-}
+from ..losses import PairwiseLogisticLoss
+from ..losses import LOSS_FUNCTIONS
+from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
 class PairwiseScorer(BaseScorer):
     def __init__(self, model_list,
@@ -46,13 +38,11 @@ class PairwiseScorer(BaseScorer):
         self.loss_fun_name = loss_fun_name
         self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
         self.initialize_prompt_embedder()
-
         self.to(device)
 
     def freeze_backbone(self):
         for param in self.prompt_embedder.parameters():
             param.requires_grad = False
-
 
     def get_prompt_embedding(self, prompt):
         if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
@@ -87,7 +77,6 @@ class PairwiseScorer(BaseScorer):
         out = self.fc2(x)
         out = self.relu(out)
         out = self.fc3(out)
-
         return out
 
     def get_config(self):

@@ -32,19 +32,6 @@ class PairwiseDataset(BaseDataset):
         else:
             raise ValueError(f"Dataset {dataset_name} not supported")
                              
-    def get_number_of_models(self):
-        return NUMBER_OF_MODELS[self.dataset_name]
-    
-    def __len__(self):
-        if self.random_sample:
-            return self.fixed_len if self.split == "train" else 100
-        elif self.dataset_name == "lmarena-ai/arena-human-preference-55k":
-            return len(self.dataset)
-        elif self.dataset_name == "llm-blender/mix-instruct":
-            return len(self.dataset)
-        else:
-            raise ValueError(f"Dataset {self.dataset_name} not supported")
-    
     def __getitem__(self, idx):
         """
         Returns a dictionary containing the following keys:

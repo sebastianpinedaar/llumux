@@ -48,8 +48,6 @@ class PreprocessedPairwiseDataset(BaseDataset):
         else:
             raise ValueError(f"Dataset {dataset_name} not supported")
 
-
-
     def get_embeddings(self, prompt):
         with torch.no_grad():
             tokens = self.prompt_tokenizer(prompt, return_tensors='pt', 
@@ -63,9 +61,6 @@ class PreprocessedPairwiseDataset(BaseDataset):
             prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
         return prompt_embedding.detach().cpu().numpy().tolist()
 
-    def get_number_of_models(self):
-        return NUMBER_OF_MODELS[self.dataset_name]
-    
     def __len__(self):
         return len(self.dataset)
         

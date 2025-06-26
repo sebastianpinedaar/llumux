@@ -1,6 +1,6 @@
 import torch
 
-class EvaluatorArgs:
+class RouterEvaluatorArgs:
     """
     Class to hold the arguments for the evaluator.
     """

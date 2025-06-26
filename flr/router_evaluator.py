@@ -10,10 +10,9 @@ class RouterEvaluator:
                                        batch_size=self.evaluator_args.batch_size, 
                                        shuffle=False)
 
-        
     def evaluate(self):
-        complexity= 0
-        score =0
+        complexity = 0
+        score = 0
         num_samples = 0
         for batch in self.eval_data_loader:
             temp_complexity, temp_score = self.score_batch(batch)

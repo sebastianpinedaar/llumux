@@ -3,8 +3,8 @@ import torch.nn as nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
-from ...losses import LOSS_FUNCTIONS
-from ..base_scorer import BaseScorer, LAST_HIDDEN_DIM
+from ..losses import LOSS_FUNCTIONS
+from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
 
 class MatrixFactorizationScorer(BaseScorer):
@@ -38,8 +38,6 @@ class MatrixFactorizationScorer(BaseScorer):
     def freeze_backbone(self):
         for param in self.prompt_embedder.parameters():
             param.requires_grad = False
-
-
 
     def forward(self, prompt, model=None, target=None, model_a=None, model_b=None,
                 **kwargs):
