@@ -10,15 +10,15 @@ from ..losses import PairwiseLogisticLoss
 from ..losses import LOSS_FUNCTIONS
 from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
-class PairwiseScorer(BaseScorer):
+class ListwiseScorer(BaseScorer):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     max_length=512,
                     prompt_embedder_name="bert-base-uncased",
-                    loss_fun_name="pairwise_logistic_loss",
+                    loss_fun_name="list_mle",
                     device="cuda"):
-        super(PairwiseScorer, self).__init__()
+        super(ListwiseScorer, self).__init__()
 
         self.model_list = model_list
         self.hidden_size = hidden_size
@@ -56,16 +56,20 @@ class PairwiseScorer(BaseScorer):
             prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
         return prompt_embedding
 
-    def forward(self, prompt, target, model_a, model_b,
+    def forward(self, prompt, target, models,
                 **kwargs):
         prompt_embedding = self.get_prompt_embedding(prompt)
         prompt_embedding = self.ln1(prompt_embedding)
         prompt_embedding = self.fc1_prompt(prompt_embedding)
-        score_a = self.score(prompt_embedding, model_a)
-        score_b = self.score(prompt_embedding, model_b)
-        loss = self.loss_fn((score_a, score_b), target.to(self.device))
+        scores = []
+        for model in models:
+            score = self.score(prompt_embedding, model)
+            scores.append(score)
+        scores = torch.stack(scores, dim=1).to(self.device)[...,0]
+        target = torch.stack(target, dim=1).to(self.device)
+        loss = self.loss_fn(scores, target)
 
-        return [score_a, score_b], loss
+        return scores, loss
 
     def score(self, prompt_embedding, model_names):
         model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()

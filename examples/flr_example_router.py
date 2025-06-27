@@ -1,7 +1,6 @@
 import argparse
 from pathlib import Path
 from flr.scorers.pointwise_scorer import PointwiseScorer
-from flr.scorers.complexity_scorer import ComplexityPredictor
 from flr.datasets.pointwise_dataset import PointwiseDataset
 from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
 from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset

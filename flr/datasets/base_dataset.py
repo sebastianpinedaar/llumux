@@ -1,11 +1,6 @@
 import numpy as np
 from datasets import load_dataset
-
-NUMBER_OF_MODELS = {
-    "lmarena-ai/arena-human-preference-55k": 64,
-    "llm-blender/mix-instruct": 12
-}
-
+from ..utils.constants import *
 
 class BaseDataset:
     def __init__(self, dataset_name: str, 
@@ -47,23 +42,6 @@ class BaseDataset:
     def __getitem__(self, idx):
         raise NotImplementedError("This method should be implemented in the subclass")
     
-
     def collect_models(self):
-        #TODO: this should be done in the __init__ method
-        #TODO. improve collection
-        if self.model_list is None:
-            models = []
-            for i in range(len(self)):
-                item = self[i]
-
-                if "model_a" in item.keys():
-                    models.append(item["model_a"])
-                if "model_b" in item.keys():
-                    models.append(item["model_b"])
-                if "model" in item.keys():
-                    models.append(item["model"])
-            
-            self.model_list = np.unique(models).tolist()
-
+        self.model_list = list(MODEL_SIZE[self.dataset_name].keys())
         return self.model_list
-

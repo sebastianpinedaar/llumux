@@ -5,8 +5,8 @@ from flr.datasets.pointwise_dataset import PointwiseDataset
 from flr.datasets.preprocessed_pairwise_dataset import PreprocessedPairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
-from flr.scorers.pairwise.scorer import PairwiseScorer
-from flr.scorers.matrix_factorization.scorer import MatrixFactorizationScorer
+from flr.scorers.pairwise_scorer import PairwiseScorer
+from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
 from flr.utils import LossTracker, CheckpointSaver
 
 

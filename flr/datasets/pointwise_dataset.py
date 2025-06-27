@@ -1,7 +1,7 @@
 import numpy as np
 
 from .base_dataset import BaseDataset
-from .base_dataset import NUMBER_OF_MODELS
+from ..utils.constants import *
 
 class PointwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 

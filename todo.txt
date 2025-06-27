@@ -1,11 +1,10 @@
 Before release
 - Generalize/factorize scorer, specially the MatrixMultiplicationScorer
-- Safe the model names to avoid the initial model name colleciton
+- Organize/homogenize classes
 
-- Create listwise loss
-- Create lis-scorer and list-dataset, listwise loss
-- Explanation of structure - docs
+
 - Fix the formate of the route dataset
+- Explanation of structure - docs
 - Test long training in other infrastructure (maybe colab, runpod)
 - Example of how to finetune with new data
 

@@ -5,12 +5,13 @@ import numpy as np
 from .base_dataset import BaseDataset
 from ..utils.constants import *
 
-class PairwiseDataset(BaseDataset):
+class ListwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
                  seed: int = 42,
                  random_sample: bool = False,
+                 list_size: int = 3,
                  model_list: list = None):
         self.dataset_name = dataset_name
         self.split = split
@@ -18,6 +19,7 @@ class PairwiseDataset(BaseDataset):
         self.seed = seed
         self.model_list = model_list
         self.random_sample = random_sample
+        self.list_size = list_size
         self.fixed_len = 10000
 
         if dataset_name == "lmarena-ai/arena-human-preference-55k":
@@ -37,49 +39,28 @@ class PairwiseDataset(BaseDataset):
         - prompt: the prompt to compare the models
         - winner_model_a: 1 if model_a is better, -1 if model_b is better
         """
-        if self.random_sample:
-            idx = np.random.randint(0, len(self.dataset))
         
-        if self.dataset_name == "lmarena-ai/arena-human-preference-55k":
-            item = self.dataset[idx]
-            item = { 
-                "prompt": item["prompt"], \
-                "target": item["winner_model_a"]-1*item["winner_model_b"], \
-                "model_a": item["model_a"],
-                "model_b": item["model_b"]
-            }
-        elif self.dataset_name == "llm-blender/mix-instruct":
-            assert self.random_sample == True, "Random sampling is required for llm-blender/mix-instruct dataset"
-            model_a = np.random.randint(0, 12)
-            model_b = np.random.randint(0, 12)
+        if self.dataset_name == "llm-blender/mix-instruct":
+            idx = np.random.randint(0, len(self.dataset))
+            model_idxs = [np.random.randint(0, 12) for _ in range(self.list_size)]
+            models = [self.dataset[idx]["candidates"][model_idx]["model"] for model_idx in model_idxs]
+            target = [self.dataset[idx]["candidates"][model_idx]["scores"]["bertscore"] for model_idx in model_idxs]
+            
+            # the target is the ground truth order
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": -np.sign(item["candidates"][model_a]["scores"]["bertscore"]-item["candidates"][model_b]["scores"]["bertscore"]).item(), \
-                "model_a": item["candidates"][model_a]["model"],
-                "model_b": item["candidates"][model_b]["model"]
+                "target": target, \
+                "models": models
             } 
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         
         return item
 
-    def collect_models(self):
-        #TODO: this should be done in the __init__ method
-        #TODO. improve collection
-        if self.model_list is None:
-            models = []
-            for i in range(len(self)):
-                item = self[i]
-                models.append(item["model_a"])
-                models.append(item["model_b"])
-            
-            self.model_list = np.unique(models).tolist()
-
-        return self.model_list
-
 
 if __name__ == "__main__":
 
-    dataset = PairwiseDataset("lmarena-ai/arena-human-preference-55k", split="train", test_size=0.1, seed=1)
+    dataset = ListwiseDataset("llm-blender/mix-instruct", split="train", test_size=0.1, seed=1)
+    print(next(iter(dataset)))
     print(dataset.get_number_of_models())

@@ -6,11 +6,7 @@ from transformers import BertModel, BertTokenizer
 
 from pathlib import Path
 from .base_dataset import BaseDataset
-
-NUMBER_OF_MODELS = {
-    "lmarena-ai/arena-human-preference-55k": 64
-}
-
+from ..utils.constants import *
 
 def preprocess(item, dataset):
     new_item = {}

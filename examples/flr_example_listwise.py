@@ -4,7 +4,8 @@ from flr.datasets.pairwise_dataset import PairwiseDataset
 from flr.datasets.preprocessed_pairwise_dataset import PreprocessedPairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
-from flr.scorers.pairwise_scorer import PairwiseScorer
+from flr.scorers.listwise_scorer import ListwiseScorer
+from flr.datasets.listwise_dataset import ListwiseDataset
 from flr.utils import LossTracker, CheckpointSaver
 
 
@@ -18,7 +19,7 @@ def parse_args():
     parser.add_argument("--hidden_size", type=int, default=32, help="Hidden size of the model.")
     parser.add_argument("--batch_size", type=int, default=128, help="Batch size for training.")
     parser.add_argument("--epochs", type=int, default=20, help="Number of epochs to train.")
-    parser.add_argument("--loss_fun", type=str, default="pairwise_logistic_loss", help="Loss function to use.")
+    parser.add_argument("--loss_fun_name", type=str, default="list_mle", help="Loss function to use.")
 
     return parser.parse_args()
 
@@ -33,24 +34,22 @@ if __name__ == "__main__":
     hidden_size = args.hidden_size
     batch_size = args.batch_size
     epochs = args.epochs
-    loss_fun = args.loss_fun
+    loss_fun_name = args.loss_fun_name
 
-    train_dataset = PreprocessedPairwiseDataset(dataset_name, split="train", test_size=test_size)
-    eval_dataset = PreprocessedPairwiseDataset(dataset_name, split="test", test_size=test_size)
-    #train_dataset = PairwiseDataset(dataset_name, split="train", test_size=test_size)
-    #eval_dataset = PairwiseDataset(dataset_name, split="test", test_size=test_size)
+    train_dataset = ListwiseDataset(dataset_name, split="train", test_size=test_size)
+    eval_dataset = ListwiseDataset(dataset_name, split="test", test_size=test_size)
 
     model_list = train_dataset.collect_models()
     callbacks = [LossTracker(),
                  CheckpointSaver(workspace_path=workspace_path)]	
     
-    scorer = PairwiseScorer(model_list, prompt_embedder_name=prompt_embedder_name, 
-                            loss_fun=loss_fun,
+    scorer = ListwiseScorer(model_list, prompt_embedder_name=prompt_embedder_name, 
+                            loss_fun_name=loss_fun_name,
                             hidden_size=hidden_size)
     trainer_args = TrainerArgs(batch_size=batch_size, lr=lr, epochs=epochs)
     trainer = Trainer(scorer, trainer_args, train_dataset=train_dataset, 
                     eval_dataset=eval_dataset,
                     callbacks=callbacks,
-                     )
+                    )
     trainer.train()
     print("Done.")

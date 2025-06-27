@@ -6,8 +6,8 @@ from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset
 from flr.datasets.preprocessed_pairwise_dataset import PreprocessedPairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
-from flr.scorers.pairwise.scorer import PairwiseScorer
-from flr.scorers.pointwise.scorer import PointwiseScorer
+from flr.scorers.pairwise_scorer import PairwiseScorer
+from flr.scorers.pointwise_scorer import PointwiseScorer
 
 from flr.utils import LossTracker, CheckpointSaver
 

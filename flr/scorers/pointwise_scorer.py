@@ -6,10 +6,10 @@ from transformers import BertModel, BertTokenizer
 from transformers import AlbertTokenizer, AlbertForSequenceClassification
 from transformers import AlbertModel
 
-from ...losses import PairwiseLogisticLoss
-from ...losses import LOSS_FUNCTIONS
+from ..losses import PairwiseLogisticLoss
+from ..losses import LOSS_FUNCTIONS
 
-from ..base_scorer import BaseScorer, LAST_HIDDEN_DIM
+from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
 class PointwiseScorer(BaseScorer):
     def __init__(self, model_list,

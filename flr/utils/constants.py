@@ -1,0 +1,21 @@
+NUMBER_OF_MODELS = {
+    "lmarena-ai/arena-human-preference-55k": 64,
+    "llm-blender/mix-instruct": 12
+}
+
+MODEL_SIZE = {
+    "llm-blender/mix-instruct": { 
+        "alpaca-native": 7,
+        "chatglm-6b": 6,
+        "dolly-v2-12b": 12,
+        "flan-t5-xxl": 11 ,
+        "koala-7B-HF": 7,
+        "llama-7b-hf-baize-lora-bf16": 7,
+        "moss-moon-003-sft": 16,
+        "mpt-7b": 7,
+        "mpt-7b-instruct": 7,
+        "oasst-sft-4-pythia-12b-epoch-3.5": 12,
+        "stablelm-tuned-alpha-7b": 7 ,
+        "vicuna-13b-1.1": 13
+    }
+}
