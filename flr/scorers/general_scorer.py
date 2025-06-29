@@ -10,15 +10,16 @@ from ..losses import PairwiseLogisticLoss
 from ..losses import LOSS_FUNCTIONS
 from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
-class ListwiseScorer(BaseScorer):
+class GeneralScorer(BaseScorer):
     def __init__(self, model_list,
                     hidden_size=32, 
                     output_size=1,
                     max_length=512,
                     prompt_embedder_name="bert-base-uncased",
                     loss_fun_name="list_mle",
+                    embeddings_merge_strategy="concat",
                     device="cuda"):
-        super(ListwiseScorer, self).__init__()
+        super(GeneralScorer, self).__init__()
 
         self.model_list = model_list
         self.hidden_size = hidden_size
@@ -32,10 +33,15 @@ class ListwiseScorer(BaseScorer):
         self.fc1_prompt = nn.Linear(self.last_hidden_state_dim, hidden_size).to(device)
         self.fc1_model = nn.Linear(len(self.model_list), hidden_size).to(device)
         self.relu = nn.LeakyReLU()
-        self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
+
+        if embeddings_merge_strategy == "concat":
+            self.fc2 = nn.Linear(2*hidden_size, hidden_size).to(device)
+        else:
+            self.fc2 = nn.Linear(hidden_size, hidden_size).to(device)
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
         self.loss_fun_name = loss_fun_name
+        self.embeddings_merge_strategy = embeddings_merge_strategy
         self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
         self.initialize_prompt_embedder()
         self.to(device)
@@ -80,8 +86,15 @@ class ListwiseScorer(BaseScorer):
         model_encoding = torch.tensor(model_encoding).to(self.device).float()
         model_embedding = self.fc1_model(model_encoding)
         
-        x = torch.cat([prompt_embedding, model_embedding], dim=1)
-        
+        if self.embeddings_merge_strategy == "multiply":
+            x = torch.multiply(prompt_embedding, model_embedding)
+        elif self.embeddings_merge_strategy == "concat":
+            x = torch.cat([prompt_embedding, model_embedding], dim=1)
+        elif self.embeddings_merge_strategy == "add":
+            x = prompt_embedding + model_embedding
+        else:
+            raise ValueError(f"Unknown embeddings merge strategy: {self.embeddings_merge_strategy}")
+
         out = self.fc2(x)
         out = self.relu(out)
         out = self.fc3(out)

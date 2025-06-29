@@ -1,10 +1,8 @@
 import argparse
 
-from flr.datasets.pairwise_dataset import PairwiseDataset
-from flr.datasets.preprocessed_pairwise_dataset import PreprocessedPairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
-from flr.scorers.listwise_scorer import ListwiseScorer
+from flr.scorers.general_scorer import GeneralScorer
 from flr.datasets.listwise_dataset import ListwiseDataset
 from flr.utils import LossTracker, CheckpointSaver
 
@@ -43,7 +41,7 @@ if __name__ == "__main__":
     callbacks = [LossTracker(),
                  CheckpointSaver(workspace_path=workspace_path)]	
     
-    scorer = ListwiseScorer(model_list, prompt_embedder_name=prompt_embedder_name, 
+    scorer = GeneralScorer(model_list, prompt_embedder_name=prompt_embedder_name, 
                             loss_fun_name=loss_fun_name,
                             hidden_size=hidden_size)
     trainer_args = TrainerArgs(batch_size=batch_size, lr=lr, epochs=epochs)
