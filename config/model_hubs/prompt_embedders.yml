@@ -1,0 +1,14 @@
+metadata:
+  description: "A list of prompt embedders with their sizes in billions of parameters."
+  version: 1.0
+models:
+  bert-base-uncased:
+    last_hidden_dim: 768
+  bert-base-cased:
+    last_hidden_dim: 768
+  albert-base-v2:
+    last_hidden_dim: 768
+  distilbert-base-cased:
+    last_hidden_dim: 768
+  identity:
+    last_hidden_dim: 768

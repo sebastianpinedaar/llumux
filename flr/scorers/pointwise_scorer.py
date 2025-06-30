@@ -2,14 +2,10 @@ import torch
 import torch.nn as nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
-from transformers import BertModel, BertTokenizer
-from transformers import AlbertTokenizer, AlbertForSequenceClassification
-from transformers import AlbertModel
 
-from ..losses import PairwiseLogisticLoss
-from ..losses import LOSS_FUNCTIONS
-
-from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
+from ..losses import loss_functions_map
+from ..utils import LAST_HIDDEN_DIM
+from .base_scorer import BaseScorer
 
 class PointwiseScorer(BaseScorer):
     def __init__(self, model_list,
@@ -37,10 +33,9 @@ class PointwiseScorer(BaseScorer):
         self.fc3 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
         self.loss_fun_name = loss_fun_name
-        self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
+        self.loss_fn = loss_functions_map[loss_fun_name]()
         self.initialize_prompt_embedder()
         self.to(device)
-
 
     def get_prompt_embedding(self, prompt):
         if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
@@ -77,10 +72,8 @@ class PointwiseScorer(BaseScorer):
         out = self.fc2(x)
         out = self.relu(out)
         out = self.fc3(out)
-
         return out
     
-
     def get_config(self):
         return {
             "model_list": self.model_list,

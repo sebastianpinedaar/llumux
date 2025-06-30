@@ -3,9 +3,9 @@ import torch.nn as nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
-from ..losses import LOSS_FUNCTIONS
-from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
-
+from ..losses import loss_functions_map
+from .base_scorer import BaseScorer
+from ..utils import LAST_HIDDEN_DIM
 
 class MatrixFactorizationScorer(BaseScorer):
     def __init__(self, model_list,
@@ -31,13 +31,9 @@ class MatrixFactorizationScorer(BaseScorer):
         self.fc2 = nn.Linear(hidden_size, output_size).to(device)
         self.ln1 = nn.LayerNorm(self.last_hidden_state_dim).to(device)
         self.loss_fun_name = loss_fun_name   
-        self.loss_fn = LOSS_FUNCTIONS[loss_fun_name]()
+        self.loss_fn = loss_functions_map[loss_fun_name]()
         self.initialize_prompt_embedder()
         self.to(device)
-
-    def freeze_backbone(self):
-        for param in self.prompt_embedder.parameters():
-            param.requires_grad = False
 
     def forward(self, prompt, model=None, target=None, model_a=None, model_b=None,
                 **kwargs):

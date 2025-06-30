@@ -1,0 +1,30 @@
+# model_name: model_size
+metadata: 
+  description: "A list of LLMs with their sizes in billions of parameters."
+  version: 1.0
+  source: https://huggingface.co/datasets/llm-blender/mix-instruct
+models:
+  alpaca-native: 
+    model_size: 7
+  chatglm-6b:
+    model_size: 6
+  dolly-v2-12b: 
+    model_size: 12
+  flan-t5-xxl: 
+    model_size: 11 
+  koala-7B-HF: 
+    model_size: 7
+  llama-7b-hf-baize-lora-bf16: 
+    model_size: 7 
+  moss-moon-003-sft: 
+    model_size: 16
+  mpt-7b: 
+    model_size: 7
+  mpt-7b-instruct: 
+    model_size: 7
+  oasst-sft-4-pythia-12b-epoch-3.5: 
+    model_size: 12
+  stablelm-tuned-alpha-7b:
+    model_size: 7 
+  vicuna-13b-1.1:
+    model_size: 13

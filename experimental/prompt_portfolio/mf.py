@@ -7,7 +7,7 @@ from datasets import load_dataset
 import matplotlib.pyplot as plt
 
 from flr.datasets.pairwise_dataset import PairwiseDataset
-from flr.cold_start.kmedoids import kmedoids
+from kmedoids import kmedoids
 
 class MatrixFactorization(nn.Module):
     def __init__(self, num_users, num_items, num_factors):

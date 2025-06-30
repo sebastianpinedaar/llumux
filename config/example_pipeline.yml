@@ -1,0 +1,28 @@
+dataset: 
+  name: llm-blender/mix-instruct
+  test_size: 0.0005
+workspace_path: "./workspace"
+config_path: "./config"
+scorers:
+  scorers_name: ScorersForRouter
+  scorers_list:
+  - model_name: PerfScorer
+    model_class: GeneralScorer
+    args:
+      hidden_size: 128
+      prompt_embedder_name: albert-base-v2
+      loss_fun_name: list_mle
+  - model_name: CostScorer
+    model_class: GeneralScorer
+    args:
+      hidden_size: 128
+      prompt_embedder_name: albert-base-v2
+      loss_fun_name: pairwise_logistic_loss
+router:
+  model_name: MainRouter
+  model_class: RatioRouter
+  args:
+    model_hub_name: llm_instruct
+    strength: 1.0
+    scorers: ScorersForRouter
+    model_hub_name: llm_instruct

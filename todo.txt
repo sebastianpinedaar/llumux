@@ -1,7 +1,9 @@
 Before release
-- Organize/homogenize classes
-- Fix the formate of the route dataset
+
+- model hub -> router with model hub -> pipeline execution -> fix route dataset format -> route dataset example 
+
 - Create a framework where we can do everything from a yaml configuration file
+- Fix the formate of the route dataset
 - Example of how to finetune with new data using only a yaml file
 
 - Test long training in other infrastructure (maybe colab, runpod)

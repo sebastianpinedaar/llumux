@@ -1,21 +1,9 @@
 import torch
 import torch.nn as nn
-from ..hub.model_hub import ModelHub
 
 from transformers import BertModel, BertTokenizer
-from transformers import AlbertTokenizer, AlbertForSequenceClassification
-from transformers import AlbertModel
+from transformers import AlbertTokenizer, AlbertModel
 from transformers import DistilBertTokenizer, DistilBertModel
-
-LAST_HIDDEN_DIM = {
-    'bert-base-uncased': 768,
-    'bert-base-cased': 768,
-    'albert-base-v2': 768,
-    'distilbert-base-cased': 768,
-    'prajjwal1/bert-tiny': 128,	
-    'prajjwal1/bert-small': 256,
-    'identity': 768
-}
 
 class BaseScorer(nn.Module):   
     def __init__(self, 
@@ -30,6 +18,10 @@ class BaseScorer(nn.Module):
             A list of scores
             """
         raise NotImplementedError
+
+    def freeze_backbone(self):
+        for param in self.prompt_embedder.parameters():
+            param.requires_grad = False
 
     def get_prompt_embedding(self, prompt):
         if self.prompt_embedder_name in ["bert-base-uncased", "prajjwal1/bert-tiny", "albert-base-v2", "distilbert-base-cased"]:
