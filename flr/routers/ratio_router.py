@@ -12,7 +12,7 @@ class RatioRouter:
     efficiency, accuracy, fairness, etc.
     """
     def __init__(self, 
-                 scorers: BaseScorer,
+                 scorer: BaseScorer,
                  profiler: BaseScorer,
                  threshold: float = 0.5,
                  strength: float = 1,
