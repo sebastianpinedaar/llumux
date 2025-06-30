@@ -16,7 +16,7 @@ class PairwiseLogisticLoss:
         Returns:
             torch.Tensor: The computed logistic loss.
         """
-        if isinstance(y_pred, list):
+        if isinstance(y_pred, list) or isinstance(y_pred, tuple):
             assert len(y_pred) == 2
             y_pred_i, y_pred_j = y_pred
             y_true = y_true.reshape(-1)

@@ -10,8 +10,9 @@ class ListMLELoss(torch.nn.Module):
     def __init__(self, eps=1e-6, padded_value_indicator=-1):
         """
         Initializes the ListMLELoss class.
-            :param eps: epsilon value, used for numerical stability
-            :param padded_value_indicator: an indicator of the y_true index containing a padded item, e.g. -1
+        Args:
+        - eps: epsilon value, used for numerical stability
+        - padded_value_indicator: an indicator of the y_true index containing a padded item, e.g. -1
         """
         super(ListMLELoss, self).__init__()
         self.eps = eps
@@ -20,9 +21,12 @@ class ListMLELoss(torch.nn.Module):
     def forward(self, y_pred, y_true):
         """
         ListMLE loss introduced in "Listwise Approach to Learning to Rank - Theory and Algorithm".
-        :param y_pred: predictions from the model, shape [batch_size, slate_length]
-        :param y_true: ground truth labels, shape [batch_size, slate_length]
-        :return: loss value, a torch.Tensor
+        Args:
+        - y_pred: predictions from the model, shape [batch_size, slate_length]
+        - param y_true: ground truth labels, shape [batch_size, slate_length]
+        
+        Returns:
+        - loss value, a torch.Tensor
         """
         # shuffle for randomised tie resolution
         random_indices = torch.randperm(y_pred.shape[-1])

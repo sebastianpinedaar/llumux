@@ -1,18 +1,16 @@
 Before release
-- Generalize/factorize scorer, specially the MatrixMultiplicationScorer
 - Organize/homogenize classes
-
-
 - Fix the formate of the route dataset
-- Explanation of structure - docs
+- Create a framework where we can do everything from a yaml configuration file
+- Example of how to finetune with new data using only a yaml file
+
 - Test long training in other infrastructure (maybe colab, runpod)
-- Example of how to finetune with new data
+- Explanation of structure - docs
 
 Future
 - Create a table with prompt-model and learn a portfolio- > learn a set of good initial portfolio
 - Select the most difficult samples, to use as portfolio for selecting the model
-- Evaluate hte prompt portfolio in a heldout mllm
-- Connection to other LLMs
+- Evaluate generation to other llms: evaluate prompt portfolio in a heldout llm
 
 RoutingLLMs
 - Create my own dataset usinng prompt portfolio to evaluate on ChatGPT, Gemini, Claude, Grok

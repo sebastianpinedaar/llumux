@@ -11,12 +11,10 @@ class BaseRouter:
     """
     def __init__(self, 
                     scorers: List[BaseScorer],	
-                    model_hub: ModelHub,
                     top_k: int = 1,
                     threshold: float = 0.5,
                    **kwargs):
         self.scorers = scorers
-        self.model_hub = model_hub
         self.top_k = top_k
         self.threshold = threshold
 

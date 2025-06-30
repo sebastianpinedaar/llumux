@@ -3,7 +3,6 @@ import torch
 import numpy as np
 import yaml
 
-from ..hub.model_hub import ModelHub
 from ..scorers.base_scorer import BaseScorer
 
 class RatioRouter:
@@ -13,7 +12,7 @@ class RatioRouter:
     efficiency, accuracy, fairness, etc.
     """
     def __init__(self, 
-                 scorer: BaseScorer,
+                 scorers: BaseScorer,
                  profiler: BaseScorer,
                  threshold: float = 0.5,
                  strength: float = 1,

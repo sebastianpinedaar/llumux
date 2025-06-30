@@ -25,7 +25,7 @@ class RouteDataset(BaseDataset):
         
         elif self.dataset_name == "llm-blender/mix-instruct":
             item = self.dataset[idx]
-            item["candidates"]= [item["candidates"]]
+            item["candidates"] = [item["candidates"]]
             item.update({
                 "prompt": item["instruction"] + ". "+ item["input"]
                 }

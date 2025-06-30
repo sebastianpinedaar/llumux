@@ -2,11 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
-from transformers import BertModel, BertTokenizer
-from transformers import AlbertTokenizer, AlbertForSequenceClassification
-from transformers import AlbertModel
 
-from ..losses import PairwiseLogisticLoss
 from ..losses import LOSS_FUNCTIONS
 from .base_scorer import BaseScorer, LAST_HIDDEN_DIM
 
@@ -71,8 +67,8 @@ class GeneralScorer(BaseScorer):
         for model in models:
             score = self.score(prompt_embedding, model)
             scores.append(score)
-        scores = torch.stack(scores, dim=1).to(self.device)[...,0]
-        target = torch.stack(target, dim=1).to(self.device)
+        scores = torch.stack(scores, dim=1).to(self.device)[...,0].float()
+        target = torch.stack(target, dim=1).to(self.device).float()
         
         if target is None:
             loss = None
@@ -95,9 +91,9 @@ class GeneralScorer(BaseScorer):
         else:
             raise ValueError(f"Unknown embeddings merge strategy: {self.embeddings_merge_strategy}")
 
-        out = self.fc2(x)
-        out = self.relu(out)
-        out = self.fc3(out)
+        hidden_out = self.fc2(x)
+        out = self.relu(hidden_out)
+        out = self.fc3(out) + hidden_out
         return out
 
     def get_config(self):

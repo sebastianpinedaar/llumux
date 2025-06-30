@@ -24,6 +24,7 @@ class PairwiseDataset(BaseDataset):
             dataset_before_split = load_dataset(dataset_name)["train"]
             self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
         elif dataset_name == "llm-blender/mix-instruct":
+            self.random_sample = True
             dataset_before_split = load_dataset(dataset_name)["train"]
             self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]  
         else:
@@ -49,7 +50,6 @@ class PairwiseDataset(BaseDataset):
                 "model_b": item["model_b"]
             }
         elif self.dataset_name == "llm-blender/mix-instruct":
-            assert self.random_sample == True, "Random sampling is required for llm-blender/mix-instruct dataset"
             model_a = np.random.randint(0, 12)
             model_b = np.random.randint(0, 12)
             item = self.dataset[idx]
