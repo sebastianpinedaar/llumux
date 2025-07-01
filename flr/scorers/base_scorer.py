@@ -6,9 +6,10 @@ from transformers import AlbertTokenizer, AlbertModel
 from transformers import DistilBertTokenizer, DistilBertModel
 
 class BaseScorer(nn.Module):   
-    def __init__(self, 
+    def __init__(self, use_frozen_embedder: bool = False,
                    **kwargs):
         super(BaseScorer, self).__init__()
+        self.use_frozen_embedder = use_frozen_embedder
 
     def score(self, prompt: str):
         """
@@ -19,7 +20,7 @@ class BaseScorer(nn.Module):
             """
         raise NotImplementedError
 
-    def freeze_backbone(self):
+    def freeze_embedder(self):
         for param in self.prompt_embedder.parameters():
             param.requires_grad = False
 
@@ -33,7 +34,6 @@ class BaseScorer(nn.Module):
         else: 
             raise ValueError(f"Prompt embedder {self.prompt_embedder_name} not supported")
         return prompt_embedding
-    
 
     def initialize_prompt_embedder(self):
         if self.prompt_embedder_name == "bert-base-uncased":
@@ -52,6 +52,9 @@ class BaseScorer(nn.Module):
 
         else:
             raise ValueError(f"Prompt embedder {self.prompt_embedder_name} not supported")
+
+        if self.use_frozen_embedder:
+            self.freeze_embedder()
 
     @classmethod
     def from_checkpoint(cls, path):

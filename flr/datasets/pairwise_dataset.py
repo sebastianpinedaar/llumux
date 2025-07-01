@@ -3,32 +3,20 @@ from datasets import load_dataset
 import numpy as np
 
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
 class PairwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
                  seed: int = 42,
-                 random_sample: bool = False,
-                 model_list: list = None):
+                 random_sample: bool = False):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
         self.seed = seed
-        self.model_list = model_list
         self.random_sample = random_sample
         self.fixed_len = 10000
-
-        if dataset_name == "lmarena-ai/arena-human-preference-55k":
-            dataset_before_split = load_dataset(dataset_name)["train"]
-            self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
-        elif dataset_name == "llm-blender/mix-instruct":
-            self.random_sample = True
-            dataset_before_split = load_dataset(dataset_name)["train"]
-            self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]  
-        else:
-            raise ValueError(f"Dataset {dataset_name} not supported")
+        self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
                              
     def __getitem__(self, idx):
         """
@@ -63,23 +51,3 @@ class PairwiseDataset(BaseDataset):
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         
         return item
-
-    def collect_models(self):
-        #TODO: this should be done in the __init__ method
-        #TODO. improve collection
-        if self.model_list is None:
-            models = []
-            for i in range(len(self)):
-                item = self[i]
-                models.append(item["model_a"])
-                models.append(item["model_b"])
-            
-            self.model_list = np.unique(models).tolist()
-
-        return self.model_list
-
-
-if __name__ == "__main__":
-
-    dataset = PairwiseDataset("lmarena-ai/arena-human-preference-55k", split="train", test_size=0.1, seed=1)
-    print(dataset.get_number_of_models())

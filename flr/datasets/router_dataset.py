@@ -1,9 +1,6 @@
-import numpy as np
-
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
-class RouteDataset(BaseDataset):
+class RouterDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,

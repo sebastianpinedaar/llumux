@@ -1,17 +1,24 @@
 import numpy as np
 import logging
 
+from .base_callback import BaseCallback
+
 # use logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class LossTracker:
-    def __init__(self, freq=1, rolling_window=100):
+class LossTracker(BaseCallback):
+    def __init__(self, freq: int =1, 
+                 rolling_window: int =100):
         self.freq = freq
         self.rolling_window = rolling_window
         self.losses = []
+    
+    def start(self, scorer_name):
+        self.scorer_name = scorer_name
 
     def on_batch_end(self, iteration_id, loss, **kwargs):
+        assert self.scorer_name is not None, "Need to start callback with the model name."
         self.losses.append(loss.item())
         if len(self.losses) % self.freq == 0:
             #rollwing window average

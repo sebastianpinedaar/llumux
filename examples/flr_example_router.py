@@ -4,7 +4,7 @@ from flr.scorers.pointwise_scorer import PointwiseScorer
 from flr.datasets.pointwise_dataset import PointwiseDataset
 from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
 from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset
-from flr.datasets.route_dataset import RouteDataset
+from flr.datasets.router_dataset import RouterDataset
 from flr.routers.ratio_router import RatioRouter
 from flr.routers.greedy_router import GreedyRouter
 from flr.routers.random_router import RandomRouter
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     loss_fun_name = args.loss_fun_name
     train_dataset = PointwiseDataset(dataset_name, split="train", test_size=test_size, random_sample=True)
     model_list = train_dataset.collect_models()
-    eval_dataset = RouteDataset(dataset_name, split="test", 
+    eval_dataset = RouterDataset(dataset_name, split="test", 
                                                 model_list=model_list,
                                                 test_size=test_size)
 

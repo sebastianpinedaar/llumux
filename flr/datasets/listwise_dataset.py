@@ -1,9 +1,7 @@
 
-from datasets import load_dataset
 import numpy as np
 
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
 class ListwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
@@ -12,24 +10,18 @@ class ListwiseDataset(BaseDataset):
                  seed: int = 42,
                  random_sample: bool = False,
                  list_size: int = 3,
-                 model_list: list = None):
+                 fixed_len_train: int = 10000,
+                 fixed_len_eval: int = 1000):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
         self.seed = seed
-        self.model_list = model_list
         self.random_sample = random_sample
         self.list_size = list_size
-        self.fixed_len = 10000
+        self.fixed_len_train = fixed_len_train
+        self.fixed_len_eval = fixed_len_eval
+        self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
 
-        if dataset_name == "lmarena-ai/arena-human-preference-55k":
-            dataset_before_split = load_dataset(dataset_name)["train"]
-            self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
-        elif dataset_name == "llm-blender/mix-instruct":
-            dataset_before_split = load_dataset(dataset_name)["train"]
-            self.dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]  
-        else:
-            raise ValueError(f"Dataset {dataset_name} not supported")
                              
     def __getitem__(self, idx):
         """
@@ -57,10 +49,3 @@ class ListwiseDataset(BaseDataset):
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         
         return item
-
-
-if __name__ == "__main__":
-
-    dataset = ListwiseDataset("llm-blender/mix-instruct", split="train", test_size=0.1, seed=1)
-    print(next(iter(dataset)))
-    print(dataset.get_number_of_models())

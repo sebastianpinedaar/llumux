@@ -13,20 +13,20 @@ class RatioRouter:
     """
     def __init__(self, 
                  scorers: List[BaseScorer],
-                 model_hub_name: str = "llm_instruct_models",
+                 model_hub: ModelHub,
                  strength: float = 1,
                  device: str = "cuda",
                  **kwargs):
         
         assert len(scorers) == 2, "RatioRouter requires exactly two scorers: performance and complexity cost."
-        self.perf_scorer = scorers[0].to(device)
-        self.cost_scorer = scorers[1].to(device)
-        self.model_hub_name = model_hub_name
+
+        self.perf_scorer = scorers["perf_scorer"].to(device)
+        self.cost_scorer = scorers["cost_scorer"].to(device)
         self.strength = strength
         self.kwargs = kwargs
         self.perf_scorer.eval()
         self.cost_scorer.eval()
-        self.model_hub = ModelHub(model_hub_name=model_hub_name)
+        self.model_hub = model_hub
         self.model_size = np.array(
                         self.model_hub.get_attributes_from_model_card("model_size")
                         ).reshape(1, -1)

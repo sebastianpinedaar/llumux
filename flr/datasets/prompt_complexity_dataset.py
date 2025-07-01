@@ -1,7 +1,6 @@
 import numpy as np
 
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
 class PromptComplexityDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
@@ -38,8 +37,8 @@ class PromptComplexityDataset(BaseDataset):
             idx = np.random.randint(0, len(self.dataset))
         
         if self.dataset_name == "llm-blender/mix-instruct":
-            model_id = np.random.randint(0, NUMBER_OF_MODELS[self.dataset_name])
             item = self.dataset[idx]
+            model_id = np.random.randint(0, len(item["candidates"]))
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \
                 "target": self.get_prompt_complexity(item["candidates"][model_id]["text"]),

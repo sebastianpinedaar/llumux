@@ -2,8 +2,9 @@ Before release
 
 - model hub -> router with model hub -> pipeline execution -> fix route dataset format -> route dataset example 
 
+- check consistency of routers and scorers after recent changes
 - Create a framework where we can do everything from a yaml configuration file
-- Fix the formate of the route dataset
+- Fix the format of the route dataset
 - Example of how to finetune with new data using only a yaml file
 
 - Test long training in other infrastructure (maybe colab, runpod)
@@ -20,3 +21,10 @@ RoutingLLMs
 
 - https://github.com/Portkey-AI/gateway
 - https://www.runpod.io/pricing  : V100 seems to be a good option
+
+Constraints:
+- One router per pipeline, one router evaluator per pipeline
+- Pipeline can have several scorers, with different hyperparameters
+- One dataset per pipeline
+- The router is evaluated on the test dataset
+- Only one dataset type when training multiple scorers

@@ -1,16 +1,14 @@
 import numpy as np
 
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
 class PointwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
                  seed: int = 42,
-                 random_sample: bool = False,
-                 model_list: list = None):
-        super().__init__(dataset_name, split, test_size, seed, random_sample, model_list)
+                 random_sample: bool = False):
+        super().__init__(dataset_name, split, test_size, seed, random_sample)
         
     def __getitem__(self, idx):
         """

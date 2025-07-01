@@ -2,19 +2,19 @@ import torch
 from torch.utils.data import DataLoader
 
 class RouterEvaluator:
-    def __init__(self, router, evaluator_args, eval_dataset):
+    def __init__(self, router, evaluator_args):
         self.router = router
         self.evaluator_args = evaluator_args
-        self.eval_dataset = eval_dataset
-        self.eval_data_loader = DataLoader(self.eval_dataset, 
+
+
+    def evaluate(self, eval_dataset):
+        eval_data_loader = DataLoader(eval_dataset, 
                                        batch_size=self.evaluator_args.batch_size, 
                                        shuffle=False)
-
-    def evaluate(self):
         complexity = 0
         score = 0
         num_samples = 0
-        for batch in self.eval_data_loader:
+        for batch in eval_data_loader:
             temp_complexity, temp_score = self.score_batch(batch)
             num_samples += len(batch["prompt"])
             complexity += temp_complexity

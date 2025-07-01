@@ -4,21 +4,23 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
 from ..losses import loss_functions_map
-from .base_scorer import BaseScorer
 from ..utils import LAST_HIDDEN_DIM
+from .base_scorer import BaseScorer
 
 class GeneralScorer(BaseScorer):
-    def __init__(self, model_list,
-                    hidden_size=32, 
-                    output_size=1,
-                    max_length=512,
-                    prompt_embedder_name="bert-base-uncased",
-                    loss_fun_name="list_mle",
-                    embeddings_merge_strategy="concat",
-                    device="cuda"):
-        super(GeneralScorer, self).__init__()
+    def __init__(self, model_hub,
+                    use_frozen_embedder: bool = False,
+                    hidden_size: int = 32, 
+                    output_size: int = 1,
+                    max_length: int = 512,
+                    prompt_embedder_name: str ="bert-base-uncased",
+                    loss_fun_name: str ="list_mle",
+                    embeddings_merge_strategy: str ="concat",
+                    device: str ="cuda"):
+        super(GeneralScorer, self).__init__(use_frozen_embedder=use_frozen_embedder)
 
-        self.model_list = model_list
+        self.model_hub = model_hub
+        self.model_list = model_hub.get_models()
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.device = device

@@ -4,9 +4,7 @@ import torch
 import numpy as np
 from transformers import BertModel, BertTokenizer
 
-from pathlib import Path
 from .base_dataset import BaseDataset
-from ..utils.constants import *
 
 def preprocess(item, dataset):
     new_item = {}
@@ -34,9 +32,13 @@ class PreprocessedPairwiseDataset(BaseDataset):
                                                          attn_implementation="sdpa").to(device)
         self.prompt_tokenizer = BertTokenizer.from_pretrained(prompt_embedder_name)
  
+    def get_dataset(self, dataset_name, split, test_size, seed):
+        """
+        Loads the dataset and preprocesses it if necessary.
+        """
+
         if dataset_name == "lmarena-ai/arena-human-preference-55k":
-            dataset_before_split = load_dataset(dataset_name)["train"]
-            dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)[split]
+            dataset = self.get_dataset(dataset_name, split, test_size, seed)
             self.dataset = dataset.map(lambda x: preprocess(x, self), batched=True, batch_size=32)
             self.dataset.save_to_disk("workspace/"+ dataset_name + f"-preprocessed-{split}")
         elif dataset_name == "lmarena-ai/arena-human-preference-55k-preprocessed":
@@ -89,16 +91,3 @@ class PreprocessedPairwiseDataset(BaseDataset):
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         
         return item
-
-    def collect_models(self):
-        if self.model_list is None:
-            models = []
-            for item in iter(self):
-                models.append(item["model_a"])
-                models.append(item["model_b"])
-            
-            self.model_list = np.unique(models).tolist()
-
-        return self.model_list
-
-
