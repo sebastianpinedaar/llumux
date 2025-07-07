@@ -60,8 +60,8 @@ class PairwiseScorer(BaseScorer):
 
         return [score_a, score_b], loss
 
-    def score(self, prompt_embedding, model_names):
-        model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
+    def score(self, prompt_embedding, models):
+        model_encoding = self.model_encoder.transform(np.array(models).reshape(-1, 1)).toarray()
         model_encoding = torch.tensor(model_encoding).to(self.device).float()
         model_embedding = self.fc1_model(model_encoding)
         

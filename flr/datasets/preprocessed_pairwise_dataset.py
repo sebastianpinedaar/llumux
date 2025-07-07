@@ -18,7 +18,7 @@ class PreprocessedPairwiseDataset(BaseDataset):
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
-                 prompt_embedder_name="bert-base-uncased",
+                 prompt_embedder_name: str ="bert-base-uncased",
                  seed: int = 42,
                  device = "cuda"):
         self.dataset_name = dataset_name

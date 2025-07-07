@@ -1,16 +1,18 @@
 Before release
 
 - model hub -> router with model hub -> pipeline execution -> fix route dataset format -> route dataset example 
-
-- check consistency of routers and scorers after recent changes
 - Create a framework where we can do everything from a yaml configuration file
-- Fix the format of the route dataset
-- Example of how to finetune with new data using only a yaml file
 
+08.07.2025
+- Do example dataset with fixed RouteDtaset format
+- check consistency of routers and scorers after recent changes. Run different tests
+
+Near future
+- Explanation of structure - docs. Readme
 - Test long training in other infrastructure (maybe colab, runpod)
-- Explanation of structure - docs
+- Create pypi package
 
-Future
+Far Future
 - Create a table with prompt-model and learn a portfolio- > learn a set of good initial portfolio
 - Select the most difficult samples, to use as portfolio for selecting the model
 - Evaluate generation to other llms: evaluate prompt portfolio in a heldout llm
@@ -18,7 +20,7 @@ Future
 RoutingLLMs
 - Create my own dataset usinng prompt portfolio to evaluate on ChatGPT, Gemini, Claude, Grok
 
-
+Related framworks and APIs
 - https://github.com/Portkey-AI/gateway
 - https://www.runpod.io/pricing  : V100 seems to be a good option
 

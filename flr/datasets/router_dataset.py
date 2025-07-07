@@ -6,9 +6,20 @@ class RouterDataset(BaseDataset):
                  test_size: float = 0.1,
                  seed: int = 42,
                  random_sample: bool = False,
-                 model_list: list = None):
+                 model_list: list = None,
+                 **kwargs):
         super().__init__(dataset_name, split, test_size, seed, random_sample, model_list)
-        
+    
+    def process_candidates(self, candidates):
+        new_candidates = {}
+        for candidate in candidates:
+            model = candidate["model"]
+            new_candidates[model] = {
+                "text" : candidate["text"],
+                "scores" : candidate["scores"]
+            }
+        return new_candidates
+
     def __getitem__(self, idx):
         """
         Returns a dictionary containing the following keys:
@@ -22,7 +33,7 @@ class RouterDataset(BaseDataset):
         
         elif self.dataset_name == "llm-blender/mix-instruct":
             item = self.dataset[idx]
-            item["candidates"] = [item["candidates"]]
+            item["candidates"] = self.process_candidates(item["candidates"])
             item.update({
                 "prompt": item["instruction"] + ". "+ item["input"]
                 }

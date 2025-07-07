@@ -50,11 +50,11 @@ class PointwiseScorer(BaseScorer):
             prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
         return prompt_embedding
 
-    def forward(self, prompt, model, target = None, **kwargs):
+    def forward(self, prompt, models, target = None, **kwargs):
         prompt_embedding = self.get_prompt_embedding(prompt)
         prompt_embedding = self.ln1(prompt_embedding)
         prompt_embedding = self.fc1_prompt(prompt_embedding)
-        score = self.score(prompt_embedding, model)
+        score = self.score(prompt_embedding, models)
 
         if target is not None:
             loss = self.loss_fn(score.reshape(-1), target.to(self.device).float())
@@ -62,8 +62,8 @@ class PointwiseScorer(BaseScorer):
             loss = None
         return score, loss
 
-    def score(self, prompt_embedding, model_names):
-        model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
+    def score(self, prompt_embedding, models):
+        model_encoding = self.model_encoder.transform(np.array(models).reshape(-1, 1)).toarray()
         model_encoding = torch.tensor(model_encoding).to(self.device).float()
         model_embedding = self.fc1_model(model_encoding)
         

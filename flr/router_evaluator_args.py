@@ -8,4 +8,5 @@ class RouterEvaluatorArgs:
     def __init__(self, **kwargs):
         self.device = kwargs.get("device", "cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = kwargs.get("batch_size", 32)
+        self.score_name = kwargs.get("score_name", "bertscore")
 

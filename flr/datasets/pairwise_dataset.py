@@ -9,13 +9,18 @@ class PairwiseDataset(BaseDataset):
                  split: str = "train", 
                  test_size: float = 0.1,
                  seed: int = 42,
-                 random_sample: bool = False):
+                 random_sample: bool = False,
+                 fixed_len_train: int = 10000,
+                 fixed_len_eval: int = 1000,
+                 score_name: str = "bertscore"):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
         self.seed = seed
         self.random_sample = random_sample
-        self.fixed_len = 10000
+        self.fixed_len_train = fixed_len_train
+        self.fixed_len_eval = fixed_len_eval
+        self.score_name = score_name
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
                              
     def __getitem__(self, idx):
@@ -38,8 +43,8 @@ class PairwiseDataset(BaseDataset):
                 "model_b": item["model_b"]
             }
         elif self.dataset_name == "llm-blender/mix-instruct":
-            model_a = np.random.randint(0, 12)
-            model_b = np.random.randint(0, 12)
+            model_a = np.random.randint(0, self.num_models)
+            model_b = np.random.randint(0, self.num_models)
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \

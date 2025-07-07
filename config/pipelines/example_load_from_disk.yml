@@ -3,8 +3,7 @@ workspace_path: ./workspace
 config_path: ./config
 model_hub_name: llm_instruct
 datasets:
-  - dataset: 
-    dataset_name: llm-blender/mix-instruct
+  - dataset_name: llm-blender/mix-instruct
     dataset_class: ListwiseDataset
     propietary: perf_scorer
     test_size: 0.0005
@@ -12,8 +11,10 @@ datasets:
     random_sample: True
     fixed_len_eval: 100
     fixed_len_train: 100
-  - dataset: 
-    dataset_name: llm-blender/mix-instruct
+    splits:
+      - train
+      - validation
+  - dataset_name: llm-blender/mix-instruct
     dataset_class: ListwiseDataset
     propietary: cost_scorer
     test_size: 0.0005
@@ -21,15 +22,19 @@ datasets:
     random_sample: True
     fixed_len_eval: 100
     fixed_len_train: 100
-  - dataset: 
-    dataset_name: llm-blender/mix-instruct
-    dataset_class: ListwiseDataset
+    splits:
+      - train
+      - validation
+  - dataset_name: llm-blender/mix-instruct
+    dataset_class: RouterDataset
     propietary: router
     test_size: 0.0005
     list_size: 2
     random_sample: True
     fixed_len_eval: 100
     fixed_len_train: 100
+    splits:
+      - test
 callbacks:
   - callback_name: checkpoint_callback
     callback_class: CheckpointSaver
@@ -40,14 +45,14 @@ callbacks:
 scorers:
   - scorer_name: perf_scorer
     scorer_class: GeneralScorer
-    load_from_disk: False
+    load_from_disk: True
     hidden_size: 8
     prompt_embedder_name: albert-base-v2
     loss_fun_name: list_mle
     use_frozen_embedder: True
   - scorer_name: cost_scorer
     scorer_class: GeneralScorer
-    load_from_disk: False
+    load_from_disk: True
     hidden_size: 8
     prompt_embedder_name: albert-base-v2
     loss_fun_name: list_mle

@@ -32,6 +32,7 @@ class BaseDataset:
             Dataset: The loaded dataset.
         """
         if dataset_name == "lmarena-ai/arena-human-preference-55k":
+            self.num_models = 64
             if split == "train":
                 dataset_before_split = load_dataset(dataset_name)["train"]
                 temp_dataset = dataset_before_split.train_test_split(test_size=test_size, seed=seed)["train"]
@@ -46,6 +47,7 @@ class BaseDataset:
             else:
                 raise ValueError(f"Split {split} not supported for dataset {dataset_name}")
         elif dataset_name == "llm-blender/mix-instruct":
+            self.num_models = 12
             dataset = load_dataset(dataset_name)[split]
         else:
             raise ValueError(f"Dataset {dataset_name} not supported")

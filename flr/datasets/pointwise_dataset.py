@@ -24,7 +24,7 @@ class PointwiseDataset(BaseDataset):
             raise NotImplementedError("PointwiseDataset is not implemented for lmarena-ai/arena-human-preference-55k dataset")
         
         elif self.dataset_name == "llm-blender/mix-instruct":
-            model_id = np.random.randint(0, NUMBER_OF_MODELS[self.dataset_name])
+            model_id = np.random.randint(0, self.num_models)
             item = self.dataset[idx]
             item = { 
                 "prompt": item["instruction"] + ". "+ item["input"], \

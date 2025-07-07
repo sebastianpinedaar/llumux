@@ -11,7 +11,8 @@ class ListwiseDataset(BaseDataset):
                  random_sample: bool = False,
                  list_size: int = 3,
                  fixed_len_train: int = 10000,
-                 fixed_len_eval: int = 1000):
+                 fixed_len_eval: int = 1000,
+                 score_name: str = "bertscore"):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
@@ -20,6 +21,7 @@ class ListwiseDataset(BaseDataset):
         self.list_size = list_size
         self.fixed_len_train = fixed_len_train
         self.fixed_len_eval = fixed_len_eval
+        self.score_name = score_name
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
 
                              
@@ -34,7 +36,7 @@ class ListwiseDataset(BaseDataset):
         
         if self.dataset_name == "llm-blender/mix-instruct":
             idx = np.random.randint(0, len(self.dataset))
-            model_idxs = [np.random.randint(0, 12) for _ in range(self.list_size)]
+            model_idxs = [np.random.randint(0, self.num_models) for _ in range(self.list_size)]
             models = [self.dataset[idx]["candidates"][model_idx]["model"] for model_idx in model_idxs]
             target = [self.dataset[idx]["candidates"][model_idx]["scores"]["bertscore"] for model_idx in model_idxs]
             

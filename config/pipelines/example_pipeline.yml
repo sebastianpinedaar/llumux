@@ -1,0 +1,70 @@
+pipeline_name: example_pipeline
+workspace_path: ./workspace
+config_path: ./config
+model_hub_name: llm_instruct
+datasets:
+  - dataset_name: llm-blender/mix-instruct
+    dataset_class: ListwiseDataset
+    propietary: perf_scorer
+    test_size: 0.0005
+    list_size: 2
+    random_sample: True
+    fixed_len_eval: 100
+    fixed_len_train: 100
+    splits:
+      - train
+      - validation
+  - dataset_name: llm-blender/mix-instruct
+    dataset_class: ListwiseDataset
+    propietary: cost_scorer
+    test_size: 0.0005
+    list_size: 2
+    random_sample: True
+    fixed_len_eval: 100
+    fixed_len_train: 100
+    splits:
+      - train
+      - validation
+  - dataset_name: llm-blender/mix-instruct
+    dataset_class: RouterDataset
+    propietary: router
+    test_size: 0.0005
+    list_size: 2
+    random_sample: True
+    fixed_len_eval: 100
+    fixed_len_train: 100
+    splits:
+      - test
+callbacks:
+  - callback_name: checkpoint_callback
+    callback_class: CheckpointSaver
+    freq: 5
+  - callback_name: loss_tracker_callback
+    callback_class: LossTracker
+    freq: 5
+scorers:
+  - scorer_name: perf_scorer
+    scorer_class: GeneralScorer
+    load_from_disk: False
+    hidden_size: 8
+    prompt_embedder_name: albert-base-v2
+    loss_fun_name: list_mle
+    use_frozen_embedder: True
+  - scorer_name: cost_scorer
+    scorer_class: GeneralScorer
+    load_from_disk: False
+    hidden_size: 8
+    prompt_embedder_name: albert-base-v2
+    loss_fun_name: list_mle
+    use_frozen_embedder: True
+trainer:
+  batch_size: 6
+  lr: 0.0001
+  epochs: 1
+  eval_freq : 5
+router:
+  router_class: RatioRouter
+  model_hub_name: llm_instruct
+  strength: 1.0
+router_evaluator:
+  batch_size: 4

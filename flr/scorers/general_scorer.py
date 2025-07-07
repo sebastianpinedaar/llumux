@@ -8,7 +8,7 @@ from ..utils import LAST_HIDDEN_DIM
 from .base_scorer import BaseScorer
 
 class GeneralScorer(BaseScorer):
-    def __init__(self, model_hub,
+    def __init__(self, model_list,
                     use_frozen_embedder: bool = False,
                     hidden_size: int = 32, 
                     output_size: int = 1,
@@ -19,8 +19,7 @@ class GeneralScorer(BaseScorer):
                     device: str ="cuda"):
         super(GeneralScorer, self).__init__(use_frozen_embedder=use_frozen_embedder)
 
-        self.model_hub = model_hub
-        self.model_list = model_hub.get_models()
+        self.model_list = model_list
         self.hidden_size = hidden_size
         self.output_size = output_size
         self.device = device
@@ -67,11 +66,11 @@ class GeneralScorer(BaseScorer):
             score = self.score(prompt_embedding, model)
             scores.append(score)
         scores = torch.stack(scores, dim=1).to(self.device)[...,0].float()
-        target = torch.stack(target, dim=1).to(self.device).float()
         
         if target is None:
             loss = None
         else:
+            target = torch.stack(target, dim=1).to(self.device).float()
             loss = self.loss_fn(scores, target)
 
         return scores, loss
@@ -90,9 +89,9 @@ class GeneralScorer(BaseScorer):
         else:
             raise ValueError(f"Unknown embeddings merge strategy: {self.embeddings_merge_strategy}")
 
-        hidden_out = self.fc2(x)
-        out = self.relu(hidden_out)
-        out = self.fc3(out) + hidden_out
+        x = self.fc2(x)
+        x = self.relu(x)
+        out = self.fc3(x)
         return out
 
     def get_config(self):

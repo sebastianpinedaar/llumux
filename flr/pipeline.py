@@ -1,6 +1,7 @@
 import os
 from typing import List, Dict
 
+from collections import defaultdict
 from pathlib import Path
 import yaml
 
@@ -28,10 +29,19 @@ class Pipeline:
         """
         with open(self.config_path, 'r') as file:
             config = yaml.safe_load(file)
-        self.workspace_path = config.get(Path("workspace_path"),  
-                                         Path(os.environ["FLR_HOME"]) / "config")
-        self.config_path = config.get(Path("config_path"),
-                                        Path(os.environ["FLR_HOME"]) / "workspace")
+        self.workspace_path = config.get("workspace_path", None)
+        self.config_path = config.get("config_path", None)
+
+        if self.workspace_path is None:
+            self.workspace_path = Path(os.environ.get("FLR_HOME", "")) / "workspace"
+        else:
+            self.workspace_path = Path(self.workspace_path)
+        
+        if self.config_path is None:
+            self.config_path = Path(os.environ.get("FLR_HOME", "")) / "config"
+        else:
+            self.config_path = Path(self.config_path)
+
         return config
 
     def get_callbacks(self, callbacks_args : dict):
@@ -46,16 +56,18 @@ class Pipeline:
 
     def get_scorer(self, scorer_class,
                    scorer_name,
-                   model_hub : ModelHub,
+                   model_list : List,
                    load_from_disk: bool = False,
                    **scorer_args):
         scorer_class = eval(scorer_class)
-        scorer_path = self.workspace_path / "scorers" / scorer_name / "checkpoints" / "best_checkpoint.pt"
+        scorer_path = self.workspace_path / "scorers" / scorer_name / "best_checkpoint.pt"
         
         if load_from_disk:
             scorer = scorer_class.from_checkpoint(scorer_path)
+            scorer.trained = True
         else:
-            scorer = scorer_class(model_hub, **scorer_args)
+            scorer = scorer_class(model_list, **scorer_args)
+            scorer.trained = False
         return scorer
     
     def get_dataset(self, dataset_name : str, 
@@ -74,16 +86,17 @@ class Pipeline:
         """
         dataset_class = eval(dataset_class)
         dataset = dataset_class(dataset_name, split=split, **dataset_args)
-        return {propietary: {split: dataset}}
+        return dataset
     
-    def get_datasets(self, dataset_args, splits=["train", "val"]):
-        datasets = {}
+    def get_datasets(self, dataset_args : Dict):
+        datasets = defaultdict(lambda:{})
 
         for args in dataset_args:
+            splits = args.pop("splits", ["train", "validation"])
             for split in splits:
-                datasets.update(
-                    self.get_dataset(split=split, **args)
-                )
+                dataset = self.get_dataset(split=split, **args)
+                datasets[args["propietary"]][split] = dataset
+
         return datasets
 
     def get_scorers(self, model_hub : ModelHub,
@@ -101,9 +114,10 @@ class Pipeline:
         scorers = {}
         for args in scorers_args:
             scorer_name = args["scorer_name"]
-            scorer = self.get_scorer(model_hub=model_hub,
+            scorer = self.get_scorer(model_list=model_hub.get_models(),
                                      **args)
             scorers[scorer_name] = scorer
+        
         return scorers
         
     def get_trainer(self, scorer : BaseScorer, 
@@ -124,7 +138,7 @@ class Pipeline:
         trainer_args = TrainerArgs(**trainer_args)
         return Trainer(scorer, trainer_args, train_dataset, val_dataset, callbacks)
 
-    def get_router(self, scorers : Dict[BaseScorer], 
+    def get_router(self, scorers : Dict[str, BaseScorer], 
                    model_hub : ModelHub, 
                    router_class : str,
                    **router_args):
@@ -167,23 +181,25 @@ class Pipeline:
         
         model_hub = ModelHub(self.pipeline_config["model_hub_name"])
         callbacks = self.get_callbacks(self.pipeline_config["callbacks"])
-        scorers = self.get_scorers(model_hub, self.pipeline_config["scorers"])
 
-        self.datasets = self.get_datasets(["train", "val"], self.pipeline_config['datasets'])
+        self.datasets = self.get_datasets(self.pipeline_config['datasets'])
+
+        scorers = self.get_scorers(model_hub, self.pipeline_config["scorers"])
         for scorer_name, scorer in scorers.items():
-            [callback.start(scorer_name=scorer_name) for callback in callbacks.values()]
-            self.train_scorer(scorer, callbacks, 
-                              self.datasets["scorer_name"]["train"], 
-                              self.datasets["scorer_name"]["val"], 
-                              **self.pipeline_config["trainer"])
+            if not scorer.trained:
+                [callback.start(scorer_name=scorer_name) for callback in callbacks.values()]
+                self.train_scorer(scorer, callbacks, 
+                                self.datasets[scorer_name]["train"], 
+                                self.datasets[scorer_name]["validation"], 
+                                **self.pipeline_config["trainer"])
         
         if "router" in self.pipeline_config.keys():
             router_evaluator_args = RouterEvaluatorArgs(**self.pipeline_config['router_evaluator'])
-            self.router = self.get_router(self.scorers, model_hub, **self.pipeline_config["router"])
+            self.router = self.get_router(scorers, model_hub, **self.pipeline_config["router"])
             self.router_evaluator = RouterEvaluator(evaluator_args=router_evaluator_args,
                                                         router=self.router)
 
-    def evaluate(self, eval_dataset : BaseDataset):
+    def evaluate(self, eval_dataset : BaseDataset = None):
         """Evaluate the router on the provided dataset.
         Args:
             eval_dataset (Dataset): The dataset to use for evaluation.
@@ -191,7 +207,7 @@ class Pipeline:
             float: The evaluation score.
         """
         if eval_dataset is None:
-            eval_dataset = self.datasets["router"]
+            eval_dataset = self.datasets["router"]["test"]
         
         if not hasattr(self, 'router_evaluator'):
             raise ValueError("Router evaluator has not been initialized. Please call fit() first.")

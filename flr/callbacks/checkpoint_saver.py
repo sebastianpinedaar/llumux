@@ -1,7 +1,10 @@
+import os
+
 import torch
 import logging
-from pathlib import Path
 import numpy as np
+
+from pathlib import Path
 
 from .base_callback import BaseCallback
 
@@ -10,12 +13,13 @@ logger = logging.getLogger(__name__)
 
 class CheckpointSaver(BaseCallback):
     def __init__(self, 
-                  workspace_path: str = "",
+                  workspace_path: str = None,
                   freq: int = 1,
                   checkpoint_dir:str ="scorers"):
         
-        assert workspace_path is not None, "Workspace path is required."
-        self.workspace_path = Path(workspace_path)
+        if workspace_path is None:
+            workspace_path = Path(os.environ.get("FLR_HOME", "")) / "workspace"
+        self.workspace_path = Path(workspace_path) 
         self.freq = freq
         self.checkpoint_dir = checkpoint_dir
 

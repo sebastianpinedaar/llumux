@@ -35,9 +35,9 @@ class MatrixFactorizationScorer(BaseScorer):
         self.initialize_prompt_embedder()
         self.to(device)
 
-    def forward(self, prompt, model=None, target=None, model_a=None, model_b=None,
+    def forward(self, prompt, models=None, target=None, model_a=None, model_b=None,
                 **kwargs):
-        if model is None:
+        if models is None:
             assert model_a is not None and model_b is not None, "model_a and model_b must be provided if model is None"
             prompt_embedding = self.get_prompt_embedding(prompt)
             prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
@@ -49,7 +49,7 @@ class MatrixFactorizationScorer(BaseScorer):
         else:
             prompt_embedding = self.get_prompt_embedding(prompt)
             prompt_embedding = self.fc1_prompt(self.ln1(prompt_embedding))
-            score = self.score(prompt_embedding, model)
+            score = self.score(prompt_embedding, models)
             loss = None
             return score, loss
         
