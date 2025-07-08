@@ -1,0 +1,8 @@
+metadata:
+  description: "Model hub for toy example."
+  version: 1.0
+models:
+  model1:
+    model_size: 2
+  model2:
+    model_size: 1

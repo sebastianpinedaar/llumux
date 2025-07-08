@@ -6,9 +6,20 @@ class RouterDataset(BaseDataset):
                  test_size: float = 0.1,
                  seed: int = 42,
                  random_sample: bool = False,
-                 model_list: list = None,
+                 fixed_len_train: int = 10000,
+                 fixed_len_eval: int = 1000,
+                 model_hub_name: str = None,
+                 dataset_path: str = None,
                  **kwargs):
-        super().__init__(dataset_name, split, test_size, seed, random_sample, model_list)
+        super().__init__(dataset_name=dataset_name, 
+                         split=split, 
+                         test_size=test_size, 
+                         seed=seed, 
+                         random_sample=random_sample, 
+                         fixed_len_train=fixed_len_train,
+                         fixed_len_eval=fixed_len_eval,
+                         model_hub_name=model_hub_name,
+                         dataset_path=dataset_path)
     
     def process_candidates(self, candidates):
         new_candidates = {}
@@ -38,6 +49,8 @@ class RouterDataset(BaseDataset):
                 "prompt": item["instruction"] + ". "+ item["input"]
                 }
             )
+        elif self.dataset_name == "custom_flr":
+            item = self.dataset[idx]
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         

@@ -1,0 +1,20 @@
+{
+"version": 1.0,
+"data": [{
+        "prompt": "Hello world!", 
+        "candidates": {
+            "model1": {"text": "Hi!", 
+                    "scores":{"bertscore": 0.7,
+                                "bleu": 0.6
+                                }
+                        }
+                    ,
+            "model2": {"text": "Hey!", 
+                    "scores":{"bertscore": 0.6,
+                                "bleu": 0.5
+                                }
+                        }
+            }
+        }
+    ]
+}

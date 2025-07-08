@@ -88,12 +88,13 @@ class Pipeline:
         dataset = dataset_class(dataset_name, split=split, **dataset_args)
         return dataset
     
-    def get_datasets(self, dataset_args : Dict):
+    def get_datasets(self, model_hub_name, dataset_args : Dict):
         datasets = defaultdict(lambda:{})
 
         for args in dataset_args:
             splits = args.pop("splits", ["train", "validation"])
             for split in splits:
+                args.update({"model_hub_name":model_hub_name})
                 dataset = self.get_dataset(split=split, **args)
                 datasets[args["propietary"]][split] = dataset
 
@@ -179,10 +180,11 @@ class Pipeline:
         if not self.pipeline_config:
             raise ValueError("Pipeline configuration is not loaded. Please check the config path.")
         
-        model_hub = ModelHub(self.pipeline_config["model_hub_name"])
+        model_hub_name = self.pipeline_config["model_hub_name"]
+        model_hub = ModelHub(model_hub_name)
         callbacks = self.get_callbacks(self.pipeline_config["callbacks"])
 
-        self.datasets = self.get_datasets(self.pipeline_config['datasets'])
+        self.datasets = self.get_datasets(model_hub_name, self.pipeline_config['datasets'])
 
         scorers = self.get_scorers(model_hub, self.pipeline_config["scorers"])
         for scorer_name, scorer in scorers.items():

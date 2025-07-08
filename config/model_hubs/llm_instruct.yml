@@ -1,6 +1,5 @@
-# model_name: model_size
 metadata: 
-  description: "A list of LLMs with their sizes in billions of parameters."
+  description: "A list of LLMs with their sizes in billions of parameters. Model size given in billions."
   version: 1.0
   source: https://huggingface.co/datasets/llm-blender/mix-instruct
 models:

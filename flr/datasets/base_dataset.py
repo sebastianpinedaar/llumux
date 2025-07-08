@@ -1,5 +1,8 @@
 import numpy as np
+from pathlib import Path
 from datasets import load_dataset
+
+from ..hub.model_hub import ModelHub
 
 class BaseDataset:
     def __init__(self, dataset_name: str, 
@@ -8,7 +11,10 @@ class BaseDataset:
                  seed: int = 42,
                  random_sample: bool = False,
                  fixed_len_train: int = 10000,
-                 fixed_len_eval: int = 1000):
+                 fixed_len_eval: int = 1000,
+                 model_hub_name: str = None,
+                 dataset_path: str = None,
+                 target_scale: float = 1.):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
@@ -16,6 +22,9 @@ class BaseDataset:
         self.random_sample = random_sample
         self.fixed_len_train = fixed_len_train
         self.fixed_len_eval = fixed_len_eval
+        self.model_hub_name = model_hub_name
+        self.dataset_path = Path(dataset_path)
+        self.target_scale = target_scale
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
 
     def get_dataset(self, dataset_name: str, 
@@ -49,6 +58,15 @@ class BaseDataset:
         elif dataset_name == "llm-blender/mix-instruct":
             self.num_models = 12
             dataset = load_dataset(dataset_name)[split]
+        
+        elif dataset_name == "custom_flr":
+            assert self.model_hub_name is not None, "Custom datasets need to provide a model hub name."
+            assert self.dataset_path is not None, "Custom ndatasets need to have a specified path."
+            self.model_hub = ModelHub(model_hub_name=self.model_hub_name)
+            self.models = self.model_hub.get_models()
+            self.num_models = len(self.models)
+
+            dataset = load_dataset("json", data_files={split: str(self.dataset_path / (split + ".json"))}, field="data")[split]
         else:
             raise ValueError(f"Dataset {dataset_name} not supported")
 
@@ -57,12 +75,20 @@ class BaseDataset:
     def __len__(self):
         if self.random_sample:
             return self.fixed_len_train if self.split == "train" else self.fixed_len_eval
-        elif self.dataset_name == "lmarena-ai/arena-human-preference-55k":
-            return len(self.dataset)
-        elif self.dataset_name == "llm-blender/mix-instruct":
-            return len(self.dataset)
         else:
-            raise ValueError(f"Dataset {self.dataset_name} not supported")
-    
+            return len(self.dataset)
+
     def __getitem__(self, idx):
         raise NotImplementedError("This method should be implemented in the subclass")
+    
+    def get_text_complexity(self, text: str):
+        """
+        Calculate the complexity of the prompt based on the specified complexity type.
+        """
+        if self.score_name == "char_count_complexity":
+            return len(text) / self.target_scale
+        elif self.score_name == "word_count_complexity":
+            return len(text.split()) / self.target_scale
+        else:
+            raise ValueError(f"Complexity type {self.complexity_type} not supported")
+        

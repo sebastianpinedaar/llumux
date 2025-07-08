@@ -3,7 +3,7 @@ from pathlib import Path
 from flr.scorers.pointwise_scorer import PointwiseScorer
 from flr.datasets.pointwise_dataset import PointwiseDataset
 from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
-from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset
+from flr.datasets.text_complexity_dataset import PromptComplexityDataset
 from flr.datasets.router_dataset import RouterDataset
 from flr.routers.ratio_router import RatioRouter
 from flr.routers.greedy_router import GreedyRouter

@@ -2,7 +2,7 @@ import argparse
 
 from flr.datasets.pairwise_dataset import PairwiseDataset
 from flr.datasets.pointwise_dataset import PointwiseDataset
-from flr.datasets.prompt_complexity_dataset import PromptComplexityDataset
+from flr.datasets.text_complexity_dataset import TextComplexityDataset
 from flr.datasets.preprocessed_pairwise_dataset import PreprocessedPairwiseDataset
 from flr.trainer import Trainer
 from flr.trainer_args import TrainerArgs
