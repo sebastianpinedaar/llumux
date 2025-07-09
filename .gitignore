@@ -1,6 +1,7 @@
 data/*
 **/__pycache__/*
 **/*.pyc
+experimental_code/
 .vscode/*
 workspaces/*
 workspace/*
