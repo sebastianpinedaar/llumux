@@ -59,13 +59,15 @@ class ListwiseDataset(BaseDataset):
             
             # the target is the ground truth order
             item = { 
-                "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": target, \
+                "prompts": item["instruction"] + ". "+ item["input"], \
+                "targets": target, \
                 "models": models
             }
         elif self.dataset_name == "custom_flr":
-            models = np.random.choice(self.models, self.list_size).tolist()
             item = self.dataset[idx]
+            available_models = list(item["candidates"].keys())
+            models = np.random.choice(available_models, self.list_size).tolist()
+
             if self.score_name.endswith("complexity"):
                 target = [
                     self.get_text_complexity(item["candidates"][model]["text"]) \
@@ -76,8 +78,8 @@ class ListwiseDataset(BaseDataset):
                            for model in models]
             
             item = { 
-                "prompt": item["prompt"],
-                "target": target, \
+                "prompts": item["prompt"],
+                "targets": target, \
                 "models": models
             }            
         else:

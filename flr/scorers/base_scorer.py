@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from typing import List
 from transformers import BertModel, BertTokenizer
 from transformers import AlbertTokenizer, AlbertModel
 from transformers import DistilBertTokenizer, DistilBertModel
@@ -24,16 +25,21 @@ class BaseScorer(nn.Module):
         for param in self.prompt_embedder.parameters():
             param.requires_grad = False
 
-    def get_prompt_embedding(self, prompt):
-        if self.prompt_embedder_name in ["bert-base-uncased", "prajjwal1/bert-tiny", "albert-base-v2", "distilbert-base-cased"]:
-            tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=self.max_length, truncation=True).to(self.device)
-            prompt_embedding = self.prompt_embedder(**tokens)
-            prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]    
+    def get_prompt_embedding(self, prompts: List[str]):
+        if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
+            tokens = self.prompt_tokenizer(prompts, return_tensors='pt', 
+                                           padding="max_length", 
+                                           max_length=self.max_length, 
+                                           truncation=True).to(self.device)
+            input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
+            prompt_embedding = self.prompt_embedder(input_ids=input_ids,
+                                                    token_type_ids=token_type_ids,
+                                                    attention_mask=attention_mask)
+            prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
         elif self.prompt_embedder_name == "identity":
-            prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
-        else: 
-            raise ValueError(f"Prompt embedder {self.prompt_embedder_name} not supported")
+            prompt_embedding = torch.vstack(prompts).T.to(self.device).float()
         return prompt_embedding
+
 
     def initialize_prompt_embedder(self):
         if self.prompt_embedder_name == "bert-base-uncased":

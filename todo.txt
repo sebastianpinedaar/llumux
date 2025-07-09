@@ -1,18 +1,18 @@
-Before release
-
-- model hub -> router with model hub -> pipeline execution -> fix route dataset format -> route dataset example 
-- Create a framework where we can do everything from a yaml configuration file
-
 08.07.2025
-- Do example dataset with fixed RouteDtaset format
+- create cli interface for testing
 - check consistency of routers and scorers after recent changes. Run different tests
 
 Near future
-- Explanation of structure - docs. Readme
+- docstring
+- Readme Explanation of structure
+
+Middle term
+- Create documentation website
 - Test long training in other infrastructure (maybe colab, runpod)
 - Create pypi package
 
 Far Future
+- Add new 
 - Create a table with prompt-model and learn a portfolio- > learn a set of good initial portfolio
 - Select the most difficult samples, to use as portfolio for selecting the model
 - Evaluate generation to other llms: evaluate prompt portfolio in a heldout llm
@@ -30,3 +30,11 @@ Constraints:
 - One dataset per pipeline
 - The router is evaluated on the test dataset
 - Only one dataset type when training multiple scorers
+- custom_flr: gives flexibity to user, by allowing him-her to have a personalized list of models per samples
+
+Advantages:
+- Easy to deploy: using just a yaml file
+- Build routers with any scorers
+- Imlement train and keep track of different scorers on several datasets
+- Use different loss functions and datasets for training scorers
+- Share model hubs across scorers and routers

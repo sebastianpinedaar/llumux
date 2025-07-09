@@ -72,7 +72,6 @@ class Pipeline:
     
     def get_dataset(self, dataset_name : str, 
                      dataset_class : BaseDataset,
-                     propietary: str,
                      split : str,
                      **dataset_args):
         """ Get the train, validation, and test datasets based on the dataset name.
@@ -93,10 +92,12 @@ class Pipeline:
 
         for args in dataset_args:
             splits = args.pop("splits", ["train", "validation"])
+            propietary = args.pop("propietary")
             for split in splits:
+                
                 args.update({"model_hub_name":model_hub_name})
                 dataset = self.get_dataset(split=split, **args)
-                datasets[args["propietary"]][split] = dataset
+                datasets[propietary][split] = dataset
 
         return datasets
 
@@ -194,7 +195,7 @@ class Pipeline:
                                 self.datasets[scorer_name]["train"], 
                                 self.datasets[scorer_name]["validation"], 
                                 **self.pipeline_config["trainer"])
-        
+            scorer.eval()
         if "router" in self.pipeline_config.keys():
             router_evaluator_args = RouterEvaluatorArgs(**self.pipeline_config['router_evaluator'])
             self.router = self.get_router(scorers, model_hub, **self.pipeline_config["router"])

@@ -15,16 +15,16 @@ class RouterEvaluator:
         num_samples = 0
         for batch in eval_data_loader:
             temp_complexity, temp_score = self.score_batch(batch)
-            num_samples += len(batch["prompt"])
+            num_samples += len(batch["prompts"])
             complexity += temp_complexity
             score += temp_score
         return complexity / num_samples, score / num_samples
     
     def score_batch(self, batch):
-        selected_models = self.router.route(batch["prompt"])
+        selected_models = self.router.route(batch["prompts"])
         answers_complexity = []
         answers_score = []
-        for i in range(len(batch["prompt"])):
+        for i in range(len(batch["prompts"])):
             answer = batch["candidates"][selected_models[i]]["text"][i]
             score = batch["candidates"][selected_models[i]]["scores"][self.evaluator_args.score_name][i].item()
             answers_complexity.append(self.router.compute_complexity(answer))

@@ -46,11 +46,12 @@ class RouterDataset(BaseDataset):
             item = self.dataset[idx]
             item["candidates"] = self.process_candidates(item["candidates"])
             item.update({
-                "prompt": item["instruction"] + ". "+ item["input"]
+                "prompts": item["instruction"] + ". "+ item["input"]
                 }
             )
         elif self.dataset_name == "custom_flr":
             item = self.dataset[idx]
+            item["prompts"]= item.pop("prompt")
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         

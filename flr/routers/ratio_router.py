@@ -39,14 +39,14 @@ class RatioRouter:
     def compute_complexity(self, answer):
         return len(answer)
     
-    def route(self, prompt: str) -> List[str]:
-        num_samples = len(prompt)
+    def route(self, prompts: List[str]) -> List[str]:
+        num_samples = len(prompts)
 
         with torch.no_grad():
             model_candidates= [[model_name] * num_samples \
                             for model_name in self.models]
             input = {
-                "prompt": prompt,
+                "prompts": prompts,
                 "models": model_candidates
             }
             cost_scorer_out = self.cost_scorer(**input)[0].cpu().numpy()

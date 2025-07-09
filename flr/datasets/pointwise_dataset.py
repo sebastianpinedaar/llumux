@@ -1,4 +1,5 @@
 import numpy as np
+from pathlib import Path
 
 from .base_dataset import BaseDataset
 
@@ -7,9 +8,27 @@ class PointwiseDataset(BaseDataset):
                  split: str = "train", 
                  test_size: float = 0.1,
                  seed: int = 42,
-                 random_sample: bool = False):
-        super().__init__(dataset_name, split, test_size, seed, random_sample)
-        
+                 random_sample: bool = False,
+                 fixed_len_train: int = 10000,
+                 fixed_len_eval: int = 1000,
+                 score_name: str = "bertscore",
+                 model_hub_name: str = None,
+                 dataset_path: str = None,
+                 target_scale: float = 1.,
+                 **kwargs):
+        self.dataset_name = dataset_name
+        self.split = split
+        self.test_size = test_size
+        self.seed = seed
+        self.random_sample = random_sample
+        self.fixed_len_train = fixed_len_train
+        self.fixed_len_eval = fixed_len_eval
+        self.score_name = score_name
+        self.dataset_path = Path(dataset_path)
+        self.model_hub_name = model_hub_name
+        self.target_scale = target_scale
+        self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
+
     def __getitem__(self, idx):
         """
         Returns a dictionary containing the following keys:
@@ -27,10 +46,26 @@ class PointwiseDataset(BaseDataset):
             model_id = np.random.randint(0, self.num_models)
             item = self.dataset[idx]
             item = { 
-                "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": item["candidates"][model_id]["scores"]["bertscore"],
-                "model": item["candidates"][model_id]["model"]
-            } 
+                "prompts": item["instruction"] + ". "+ item["input"], \
+                "targets": item["candidates"][model_id]["scores"]["bertscore"],
+                "models": item["candidates"][model_id]["model"]
+            }
+
+        elif self.dataset_name == "custom_flr":
+            item = self.dataset[idx]
+            available_models = list(item["candidates"].keys())
+            model = np.random.choice(available_models).item()
+
+            if self.score_name.endswith("complexity"):
+                target = self.get_text_complexity(item["candidates"][model]["text"])
+            else:
+                target = item["candidates"][model]["scores"][self.score_name]
+            
+            item = { 
+                "prompts": item["prompt"],
+                "targets": target,
+                "models": model
+            }   
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         

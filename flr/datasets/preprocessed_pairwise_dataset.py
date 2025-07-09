@@ -74,18 +74,18 @@ class PreprocessedPairwiseDataset(BaseDataset):
         if self.dataset_name == "lmarena-ai/arena-human-preference-55k":
             item = self.dataset[idx]
             item = { 
-                "prompt": item["prompt"], \
-                "target": item["winner_model_a"]-1*item["winner_model_b"], \
-                "model_a": item["model_a"],
-                "model_b": item["model_b"]
+                "prompts": item["prompt"], \
+                "targets": item["winner_model_a"]-1*item["winner_model_b"], \
+                "models_a": item["model_a"],
+                "models_b": item["model_b"]
             }
         elif self.dataset_name == "lmarena-ai/arena-human-preference-55k-preprocessed":
             item = self.dataset[idx]
             item = { 
-                "prompt": item["prompt"], \
-                "target": item["target"], \
-                "model_a": item["model_a"],
-                "model_b": item["model_b"]
+                "prompts": item["prompt"], \
+                "targets": item["target"], \
+                "models_a": item["model_a"],
+                "models_b": item["model_b"]
             }         
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")

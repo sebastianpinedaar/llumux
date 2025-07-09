@@ -1,5 +1,4 @@
-
-from datasets import load_dataset
+from pathlib import Path
 import numpy as np
 
 from .base_dataset import BaseDataset
@@ -12,7 +11,12 @@ class PairwiseDataset(BaseDataset):
                  random_sample: bool = False,
                  fixed_len_train: int = 10000,
                  fixed_len_eval: int = 1000,
-                 score_name: str = "bertscore"):
+                 score_name: str = "bertscore",
+                 model_hub_name: str = None,
+                 dataset_path: str = None,
+                 target_scale: float = 1.,
+                 **kwargs
+                 ):
         self.dataset_name = dataset_name
         self.split = split
         self.test_size = test_size
@@ -21,6 +25,9 @@ class PairwiseDataset(BaseDataset):
         self.fixed_len_train = fixed_len_train
         self.fixed_len_eval = fixed_len_eval
         self.score_name = score_name
+        self.model_hub_name = model_hub_name
+        self.dataset_path = Path(dataset_path)
+        self.target_scale = target_scale
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
                              
     def __getitem__(self, idx):
@@ -37,21 +44,42 @@ class PairwiseDataset(BaseDataset):
         if self.dataset_name == "lmarena-ai/arena-human-preference-55k":
             item = self.dataset[idx]
             item = { 
-                "prompt": item["prompt"], \
-                "target": item["winner_model_a"]-1*item["winner_model_b"], \
-                "model_a": item["model_a"],
-                "model_b": item["model_b"]
+                "prompts": item["prompt"], \
+                "targets": item["winner_model_a"]-1*item["winner_model_b"], \
+                "models_a": item["model_a"],
+                "models_b": item["model_b"]
             }
         elif self.dataset_name == "llm-blender/mix-instruct":
             model_a = np.random.randint(0, self.num_models)
             model_b = np.random.randint(0, self.num_models)
             item = self.dataset[idx]
             item = { 
-                "prompt": item["instruction"] + ". "+ item["input"], \
-                "target": -np.sign(item["candidates"][model_a]["scores"]["bertscore"]-item["candidates"][model_b]["scores"]["bertscore"]).item(), \
-                "model_a": item["candidates"][model_a]["model"],
-                "model_b": item["candidates"][model_b]["model"]
-            } 
+                "prompts": item["instruction"] + ". "+ item["input"], \
+                "targets": np.sign(item["candidates"][model_b]["scores"][self.score_name]\
+                                    -item["candidates"][model_a]["scores"][self.score_name]).item(), \
+                "models_a": item["candidates"][model_a]["model"],
+                "models_b": item["candidates"][model_b]["model"]
+            }
+        elif self.dataset_name == "custom_flr":
+            item = self.dataset[idx]
+            available_models = list(item["candidates"].keys())
+            models = np.random.choice(available_models, 2).tolist()
+
+            if self.score_name.endswith("complexity"):
+                targets = [
+                    self.get_text_complexity(item["candidates"][model]["text"]) \
+                    for model in models
+                ]
+            else:
+                targets = [item["candidates"][model]["scores"][self.score_name] \
+                           for model in models]
+            
+            item = { 
+                "prompts": item["prompt"],
+                "targets": np.sign(targets[1]-targets[0]),
+                "models_a": models[0],
+                "models_b": models[1]
+            }   
         else:
             raise ValueError(f"Dataset {self.dataset_name} not supported")
         

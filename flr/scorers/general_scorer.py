@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import numpy as np
+
+from typing import List
 from sklearn.preprocessing import OneHotEncoder
 
 from ..losses import loss_functions_map
@@ -8,7 +10,7 @@ from ..utils import LAST_HIDDEN_DIM
 from .base_scorer import BaseScorer
 
 class GeneralScorer(BaseScorer):
-    def __init__(self, model_list,
+    def __init__(self, model_list: List[str] = None,
                     use_frozen_embedder: bool = False,
                     hidden_size: int = 32, 
                     output_size: int = 1,
@@ -44,21 +46,11 @@ class GeneralScorer(BaseScorer):
         self.initialize_prompt_embedder()
         self.to(device)
 
-    def get_prompt_embedding(self, prompt):
-        if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
-            tokens = self.prompt_tokenizer(prompt, return_tensors='pt', padding="max_length", max_length=self.max_length, truncation=True).to(self.device)
-            input_ids, token_type_ids, attention_mask = tokens['input_ids'], tokens['token_type_ids'], tokens['attention_mask']
-            prompt_embedding = self.prompt_embedder(input_ids=input_ids,
-                                                    token_type_ids=token_type_ids,
-                                                    attention_mask=attention_mask)
-            prompt_embedding = prompt_embedding.last_hidden_state[:, 0, :]
-        elif self.prompt_embedder_name == "identity":
-            prompt_embedding = torch.vstack(prompt).T.to(self.device).float()
-        return prompt_embedding
-
-    def forward(self, prompt, models, target=None,
+    def forward(self, prompts: List[str], 
+                models: List[str], 
+                targets: List[List[float]]=None,
                 **kwargs):
-        prompt_embedding = self.get_prompt_embedding(prompt)
+        prompt_embedding = self.get_prompt_embedding(prompts)
         prompt_embedding = self.ln1(prompt_embedding)
         prompt_embedding = self.fc1_prompt(prompt_embedding)
         scores = []
@@ -67,25 +59,25 @@ class GeneralScorer(BaseScorer):
             scores.append(score)
         scores = torch.stack(scores, dim=1).to(self.device)[...,0].float()
         
-        if target is None:
+        if targets is None:
             loss = None
         else:
-            target = torch.stack(target, dim=1).to(self.device).float()
-            loss = self.loss_fn(scores, target)
+            targets = torch.stack(targets, dim=1).to(self.device).float()
+            loss = self.loss_fn(scores, targets)
 
         return scores, loss
 
-    def score(self, prompt_embedding, model_names):
-        model_encoding = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
-        model_encoding = torch.tensor(model_encoding).to(self.device).float()
-        model_embedding = self.fc1_model(model_encoding)
+    def score(self, prompt_embeddings: torch.Tensor, model_names: List[str]):
+        model_encodings = self.model_encoder.transform(np.array(model_names).reshape(-1, 1)).toarray()
+        model_encodings = torch.tensor(model_encodings).to(self.device).float()
+        model_embeddings = self.fc1_model(model_encodings)
         
         if self.embeddings_merge_strategy == "multiply":
-            x = torch.multiply(prompt_embedding, model_embedding)
+            x = torch.multiply(prompt_embeddings, model_embeddings)
         elif self.embeddings_merge_strategy == "concat":
-            x = torch.cat([prompt_embedding, model_embedding], dim=1)
+            x = torch.cat([prompt_embeddings, model_embeddings], dim=1)
         elif self.embeddings_merge_strategy == "add":
-            x = prompt_embedding + model_embedding
+            x = prompt_embeddings + model_embeddings
         else:
             raise ValueError(f"Unknown embeddings merge strategy: {self.embeddings_merge_strategy}")
 
@@ -101,5 +93,8 @@ class GeneralScorer(BaseScorer):
             "output_size": self.output_size,
             "prompt_embedder_name": self.prompt_embedder_name,
             "loss_fun_name": self.loss_fun_name,
-            "device": self.device
+            "device": self.device,
+            "use_frozen_embedder": self.use_frozen_embedder,
+            "max_length": self.max_length,
+            "embeddings_merge_strategy": self.embeddings_merge_strategy
         }
