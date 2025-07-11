@@ -1,8 +1,7 @@
-# 🚀 Fast LLM Routers
-
-**Fast LLM Routers** is a lightweight library for training and testing **routers** that select the most appropriate Large Language Model (LLM) for each propmpt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
-
 <img src="images/FLR.svg" alt="Logo" width="800"/>
+
+🚀**Fast LLM Routers** is a lightweight library for training and testing **routers** that select the most appropriate Large Language Model (LLM) for each propmpt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
+
 
 
 ## 🌟 Features
