@@ -4,6 +4,7 @@ from pathlib import Path
 from .base_dataset import BaseDataset
 
 class PointwiseDataset(BaseDataset):
+    """Dataset class for pointwise comparisons."""
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,

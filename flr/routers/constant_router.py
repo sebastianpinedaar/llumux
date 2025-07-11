@@ -18,7 +18,6 @@ class ConstantRouter:
         self.default_model_name = default_model_name
         self.kwargs = kwargs
         
-        #read yaml
         with open("config/llm_instruct_models.yml", "r") as f:
             self.model_info = yaml.safe_load(f)
         self.model_size = np.array(list(self.model_info.values())).reshape(1, -1)

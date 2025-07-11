@@ -1,6 +1,7 @@
 import torch
 
 class PairwiseCrossEntropyLoss:
+    """Pairwise Cross Entropy Loss for pairwise ranking tasks."""
     def __init__(self):
         pass
 

@@ -10,6 +10,15 @@ from ..utils import LAST_HIDDEN_DIM
 from .base_scorer import BaseScorer
 
 class GeneralScorer(BaseScorer):
+    """
+    General scorer class for evaluating models based on prompts.
+    It supports different embedding strategies and loss functions.
+    If list_size == 1, it behaves like a pointwise scorer, and supports pointwise losses.
+    If list_size == 2, it behaves like a pairwise scorer, and supports pairwise losses.
+    If list_size > 2, it behaves like a listwise scorer, and supports listwise losses.
+    It does not support pairwise datasets input.
+    """
+    
     def __init__(self, model_list: List[str] = None,
                     use_frozen_embedder: bool = False,
                     hidden_size: int = 32, 

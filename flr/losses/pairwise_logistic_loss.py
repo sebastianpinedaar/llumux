@@ -1,6 +1,7 @@
 import torch
 
 class PairwiseLogisticLoss:
+    """Pairwise Logistic Loss for pairwise ranking tasks."""
     def __init__(self, epsilon=0.01):
         self.epsilon = epsilon
 

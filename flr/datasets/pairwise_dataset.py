@@ -4,6 +4,7 @@ import numpy as np
 from .base_dataset import BaseDataset
 
 class PairwiseDataset(BaseDataset):
+    """Dataset class for pairwise comparisons."""
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,

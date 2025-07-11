@@ -1,12 +1,5 @@
-import torch
-import torch.nn as nn
-import numpy as np
-
 from typing import List
-from sklearn.preprocessing import OneHotEncoder
 
-from ..losses import loss_functions_map
-from ..utils import LAST_HIDDEN_DIM
 from .general_scorer import GeneralScorer
 
 class PointwiseScorer(GeneralScorer):

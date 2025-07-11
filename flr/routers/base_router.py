@@ -1,6 +1,5 @@
 from typing import List
 
-from ..hub.model_hub import ModelHub
 from ..scorers.base_scorer import BaseScorer
 
 class BaseRouter:   
@@ -20,6 +19,7 @@ class BaseRouter:
 
     def route(self, prompt: str):
         """
+        Route the prompt to the top k models based on the scorers.
         Args:
             prompt: A prompt string
         Returns:

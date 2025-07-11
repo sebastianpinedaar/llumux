@@ -6,7 +6,11 @@ from transformers import BertModel, BertTokenizer
 from transformers import AlbertTokenizer, AlbertModel
 from transformers import DistilBertTokenizer, DistilBertModel
 
-class BaseScorer(nn.Module):   
+class BaseScorer(nn.Module):
+    """
+    Base class for all scorers.
+    Scorers are used to evaluate models based on different criteria.
+    """ 
     def __init__(self, use_frozen_embedder: bool = False,
                    **kwargs):
         super(BaseScorer, self).__init__()
@@ -26,6 +30,12 @@ class BaseScorer(nn.Module):
             param.requires_grad = False
 
     def get_prompt_embedding(self, prompts: List[str]):
+        """
+        Get the embedding for the prompts using the prompt embedder.
+        Args:   
+            prompts: A list of prompt strings
+        Returns:    
+            A tensor of prompt embeddings"""
         if self.prompt_embedder_name in ["bert-base-uncased", "albert-base-v2"]:
             tokens = self.prompt_tokenizer(prompts, return_tensors='pt', 
                                            padding="max_length", 

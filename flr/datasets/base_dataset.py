@@ -5,6 +5,7 @@ from datasets import load_dataset
 from ..hub.model_hub import ModelHub
 
 class BaseDataset:
+    """Base class for datasets."""
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,

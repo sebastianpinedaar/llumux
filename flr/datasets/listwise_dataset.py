@@ -34,12 +34,10 @@ class ListwiseDataset(BaseDataset):
 
                          
     def __getitem__(self, idx):
-        """
-        Returns a dictionary containing the following keys:
-        - model_a: the first model to compare
-        - model_b: the second model to compare
-        - prompt: the prompt to compare the models
-        - winner_model_a: 1 if model_a is better, -1 if model_b is better
+        """Returns a dictionary containing the following keys:
+        - prompts: the prompt to compare the models 
+        - targets: the scores of the models
+        - models: the models to compare
         """
         
         if self.dataset_name == "llm-blender/mix-instruct":
@@ -79,7 +77,7 @@ class ListwiseDataset(BaseDataset):
             
             item = { 
                 "prompts": item["prompt"],
-                "targets": target, \
+                "targets": target,
                 "models": models
             }            
         else:

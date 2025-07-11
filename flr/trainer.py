@@ -53,8 +53,7 @@ class Trainer:
                                           eval_loss=eval_loss,
                                           model=self.model,
                                           batch=batch)
-            #for callback in self.callbacks:
-            #    callback.on_epoch_end()
+
 
     def evaluate(self):
         
@@ -65,7 +64,7 @@ class Trainer:
                 _, loss = self.model(**batch)
                 losses.append(loss.item())
         avg_loss = sum(losses) / len(losses)
-        logger.info(f"Avg eval loss: {avg_loss}")
+        logger.info(f"Avg. eval loss: {avg_loss}")
         
         return avg_loss
 

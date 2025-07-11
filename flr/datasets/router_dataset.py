@@ -1,6 +1,7 @@
 from .base_dataset import BaseDataset
 
 class RouterDataset(BaseDataset):
+    """Dataset class for routing tasks."""
     def __init__(self, dataset_name: str, 
                  split: str = "train", 
                  test_size: float = 0.1,
