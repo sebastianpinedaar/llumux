@@ -1,6 +1,4 @@
-<center>
-<img src="images/llumux.svg" alt="Logo" width="500"/>
-</center>
+<img src="images/llumux.svg" alt="Logo" width="500" align="center"/>
 
 <h4 align="center"><strong> Compose, train and test fast LLM routers</strong></h4>
 
