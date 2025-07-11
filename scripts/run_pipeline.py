@@ -1,6 +1,6 @@
 import argparse
 
-from flr.pipeline import Pipeline
+from llumux.pipeline import Pipeline
 
 parser = argparse.ArgumentParser(description="Execute pipeline.")
 parser.add_argument("--config_path", type=str, default="config/pipelines/example_flr_dataset.yml")

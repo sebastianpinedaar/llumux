@@ -1,6 +1,9 @@
-<img src="images/FLR.svg" alt="Logo" width="800"/>
+<img src="images/llumux.svg" alt="Logo" width="800"/>
 
-🚀**Fast LLM Routers** is a lightweight library for training and testing **routers** that select the most appropriate Large Language Model (LLM) for each propmpt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
+
+<h4 align="center"><strong> Compose, train and test fast LLM routers</strong></h4>
+
+🚀**Llumux** is a lightweight library for training and testing **routers** (a.k.a. multiplexors) that select the most appropriate Large Language Model (LLM) for each propmpt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
 
 
 
