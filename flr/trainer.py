@@ -31,7 +31,6 @@ class Trainer:
                                           lr=self.trainer_args.lr)
 
         self.model.train()
-        #self.model.to(self.trainer_args.device)
         eval_loss = np.inf
         iteration_id = 0
         for epoch in range(self.trainer_args.epochs):
