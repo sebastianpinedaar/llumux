@@ -1,9 +1,9 @@
-from flr.datasets.pairwise_dataset import PairwiseDataset
-from flr.trainer import Trainer
-from flr.trainer_args import TrainerArgs
-from flr.scorers.pairwise_scorer import PairwiseScorer
-from flr.utils import LossTracker, CheckpointSaver
-from flr.utils.parse_args import parse_args
+from llumux.datasets.pairwise_dataset import PairwiseDataset
+from llumux.trainer import Trainer
+from llumux.trainer_args import TrainerArgs
+from llumux.scorers.pairwise_scorer import PairwiseScorer
+from llumux.callbacks import LossTracker, CheckpointSaver
+from llumux.utils.parse_args import parse_args
 
 if __name__ == "__main__":
 

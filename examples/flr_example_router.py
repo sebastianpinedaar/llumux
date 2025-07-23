@@ -1,16 +1,16 @@
 import argparse
 from pathlib import Path
-from flr.scorers.pointwise_scorer import PointwiseScorer
-from flr.datasets.pointwise_dataset import PointwiseDataset
-from flr.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
-from flr.datasets.text_complexity_dataset import PromptComplexityDataset
-from flr.datasets.router_dataset import RouterDataset
-from flr.routers.ratio_router import RatioRouter
-from flr.routers.greedy_router import GreedyRouter
-from flr.routers.random_router import RandomRouter
-from flr.router_evaluator import RouterEvaluator
-from flr.router_evaluator_args import RouterEvaluatorArgs
-from flr.utils.parse_args import parse_args
+from llumux.scorers.pointwise_scorer import PointwiseScorer
+from llumux.datasets.pointwise_dataset import PointwiseDataset
+from llumux.scorers.matrix_factorization_scorer import MatrixFactorizationScorer
+from llumux.datasets.text_complexity_dataset import PromptComplexityDataset
+from llumux.datasets.router_dataset import RouterDataset
+from llumux.routers.ratio_router import RatioRouter
+from llumux.routers.greedy_router import GreedyRouter
+from llumux.routers.random_router import RandomRouter
+from llumux.router_evaluator import RouterEvaluator
+from llumux.router_evaluator_args import RouterEvaluatorArgs
+from llumux.utils.parse_args import parse_args
 
 if __name__ == "__main__":
 
@@ -39,6 +39,11 @@ if __name__ == "__main__":
 
     for strength in [0, 0.25, 0.5]:
         print(f"Evaluating with strength {strength}")
+        
+        scorers = {
+            "perf_scorer": scorer,
+            "cost_scorer": profiler
+        }
         router = RatioRouter(scorer=scorer, profiler=profiler, strength=strength)
         evaluator = RouterEvaluator(router=router, 
                                      evaluator_args=evaluator_args, 

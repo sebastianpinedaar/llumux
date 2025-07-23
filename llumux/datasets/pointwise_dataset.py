@@ -25,7 +25,7 @@ class PointwiseDataset(BaseDataset):
         self.fixed_len_train = fixed_len_train
         self.fixed_len_eval = fixed_len_eval
         self.score_name = score_name
-        self.dataset_path = Path(dataset_path)
+        self.dataset_path = Path(dataset_path) if dataset_path else None
         self.model_hub_name = model_hub_name
         self.target_scale = target_scale
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)

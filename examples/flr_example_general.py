@@ -1,15 +1,17 @@
-import argparse
-
-from flr.trainer import Trainer
-from flr.trainer_args import TrainerArgs
-from flr.scorers.general_scorer import GeneralScorer
-from flr.datasets.listwise_dataset import ListwiseDataset
-from flr.utils import LossTracker, CheckpointSaver
-from flr.utils.parse_args import parse_args
+from llumux.trainer import Trainer
+from llumux.trainer_args import TrainerArgs
+from llumux.scorers.general_scorer import GeneralScorer
+from llumux.datasets.listwise_dataset import ListwiseDataset
+from llumux.callbacks import LossTracker, CheckpointSaver
+from llumux.utils.parse_args import parse_args
+from llumux.hub.model_hub import ModelHub
 
 if __name__ == "__main__":
 
     args = parse_args()
+    assert args.list_size > 0, "List size must be greater than 0."
+    assert args.model_hub_name is not None, "Model hub name must be provided."
+
     train_dataset = ListwiseDataset(args.dataset_name, split="train", 
                                     test_size=args.test_size, 
                                     list_size=args.list_size)
@@ -18,7 +20,9 @@ if __name__ == "__main__":
                                    test_size=args.test_size, 
                                    list_size=args.list_size)
 
-    model_list = train_dataset.collect_models()
+    model_hub = ModelHub(args.model_hub_name)
+    model_list = model_hub.get_models()
+    
     callbacks = [LossTracker(),
                  CheckpointSaver(workspace_path=args.workspace_path)]	
     
