@@ -5,7 +5,7 @@
 
 <h4 align="center"><strong> Compose, train and test fast LLM routers</strong></h4>
 
-**Llumux** is a lightweight library for training and testing **routers** (a.k.a. multiplexors) that select the most appropriate Large Language Model (LLM) for each propmpt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
+**Llumux** (from **LL**m **MU**ltiple**X**ors) is a lightweight library for training and testing **routers** a.k.a. multiplexors that select the most appropriate Large Language Model (LLM) for each prompt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
 
 
 
@@ -58,22 +58,22 @@ print("Score:", score)
 
 
 ```python
-    from llumux.datasets import ListwiseDataset
-    from llumux.trainer import Trainer
-    from llumux.trainer_args import TrainerArgs
-    from llumux.scorers import GeneralScorer
-    from llums.hub import ModelHub
+from llumux.datasets import ListwiseDataset
+from llumux.trainer import Trainer
+from llumux.trainer_args import TrainerArgs
+from llumux.scorers import GeneralScorer
+from llums.hub import ModelHub
 
-    train_dataset = ListwiseDataset(dataset_name="llm-blender/mix-instruct", split="train",  list_size=3)
-    
-    model_hub = ModelHub(args.model_hub_name)
-    model_list = model_hub.get_models()
+train_dataset = ListwiseDataset(dataset_name="llm-blender/mix-instruct", split="train",  list_size=3)
 
-    scorer = GeneralScorer(model_list, prompt_embedder_name="albert-base-v2")
-    
-    trainer_args = TrainerArgs(batch_size=4 epochs=1),
-    trainer = Trainer(scorer, trainer_args, train_dataset=train_dataset)
-    trainer.train()
+model_hub = ModelHub(args.model_hub_name)
+model_list = model_hub.get_models()
+
+scorer = GeneralScorer(model_list, prompt_embedder_name="albert-base-v2")
+
+trainer_args = TrainerArgs(batch_size=4 epochs=1),
+trainer = Trainer(scorer, trainer_args, train_dataset=train_dataset)
+trainer.train()
 ```
 
 ---
@@ -81,22 +81,22 @@ print("Score:", score)
 ## 🧪 Create router by ensembling scorers
 
 ```python
-        perf_scorer = ...
-        cost_scorer = ...
-        eval_dataset = RouterDataset(dataset_name = ..., 
-                                    model_hub_name= ...)
-        scorers = {
-            "perf_scorer": perf_scorer,
-            "cost_scorer": cost_scorer
-        }
-        router = RatioRouter(scorers = scorers)
-        evaluator_args = RouterEvaluatorArgs(batch_size = batch_size)
-        evaluator = RouterEvaluator(router=router, 
-                                     evaluator_args=evaluator_args, 
-                                     eval_dataset=eval_dataset)
-        
-        eval_score = evaluator.evaluate()
-        print(f"Eval score: {eval_score}"
+perf_scorer = ...
+cost_scorer = ...
+eval_dataset = RouterDataset(dataset_name = ..., 
+                            model_hub_name= ...)
+scorers = {
+    "perf_scorer": perf_scorer,
+    "cost_scorer": cost_scorer
+}
+router = RatioRouter(scorers = scorers)
+evaluator_args = RouterEvaluatorArgs(batch_size = batch_size)
+evaluator = RouterEvaluator(router=router, 
+                                evaluator_args=evaluator_args, 
+                                eval_dataset=eval_dataset)
+
+eval_score = evaluator.evaluate()
+print(f"Eval score: {eval_score}"
 ```
 
 ---
