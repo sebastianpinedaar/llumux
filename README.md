@@ -5,7 +5,7 @@
 
 <h4 align="center"><strong> Compose, train and test fast LLM routers</strong></h4>
 
-**Llumux** (from **LL**m **MU**ltiple**X**ors) is a lightweight library for training and testing **routers** a.k.a. multiplexors that select the most appropriate Large Language Model (LLM) for each prompt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
+**Llumux** (from LLM Multiplexors) is a lightweight library for training and testing **routers** a.k.a. multiplexors that select the most appropriate Large Language Model (LLM) for each prompt. The routers can be built in a composable way by combining **scorers** that predict the answer complexity, performance, or any other user-defined criteria. It enables efficient use of multiple LLMs—balancing cost, speed, and accuracy.
 
 
 
