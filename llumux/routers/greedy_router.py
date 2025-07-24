@@ -19,10 +19,10 @@ class GreedyRouter(ConstantRouter):
         
         super().__init__(default_model_id=0, **kwargs)
         
+        
         if pick_largest:
             picking_size = max(self.model_size[0]).item()
         else:
             picking_size = min(self.model_size[0]).item()
-        self.models = np.array(list(self.model_info.keys()))
         self.default_model_id = np.random.choice(np.where(self.model_size.flatten() == picking_size)[0]).item()
         self.default_model_name = self.models[self.default_model_id]

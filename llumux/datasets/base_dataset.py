@@ -24,7 +24,7 @@ class BaseDataset:
         self.fixed_len_train = fixed_len_train
         self.fixed_len_eval = fixed_len_eval
         self.model_hub_name = model_hub_name
-        self.dataset_path = Path(dataset_path)
+        self.dataset_path = Path(dataset_path) if dataset_path else None
         self.target_scale = target_scale
         self.dataset = self.get_dataset(dataset_name, split, test_size, seed)
 
@@ -60,7 +60,7 @@ class BaseDataset:
             self.num_models = 12
             dataset = load_dataset(dataset_name)[split]
         
-        elif dataset_name == "custom_flr":
+        elif dataset_name == "custom":
             assert self.model_hub_name is not None, "Custom datasets need to provide a model hub name."
             assert self.dataset_path is not None, "Custom ndatasets need to have a specified path."
             self.model_hub = ModelHub(model_hub_name=self.model_hub_name)

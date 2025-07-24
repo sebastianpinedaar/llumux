@@ -3,10 +3,10 @@ import torch
 import numpy as np
 import yaml
 
+from .base_router  import BaseRouter
 from ..hub.model_hub import ModelHub
-from ..scorers.base_scorer import BaseScorer
 
-class ConstantRouter:
+class ConstantRouter(BaseRouter):
     """
     A router that uses the ratio of the scores from different scorers to make the final decision.
     The scorers might assess different aspects of the model such as
@@ -17,15 +17,11 @@ class ConstantRouter:
                  **kwargs):
         self.default_model_name = default_model_name
         self.kwargs = kwargs
+        super().__init__(**kwargs)
         
-        with open("config/llm_instruct_models.yml", "r") as f:
-            self.model_info = yaml.safe_load(f)
-        self.model_size = np.array(list(self.model_info.values())).reshape(1, -1)
 
-
-    def route(self, prompt: str, model_list: List[str] = None):
-        ix =np.where(np.array(model_list) == self.default_model_name)[0]
-        selected_models = np.array([ix]*len(prompt) ).reshape(-1)
+    def route(self, prompts: List[str]) -> List[str]:
+        selected_models = [self.default_model_name]*len(prompts)
         return selected_models
     
     def compute_complexity(self, answer):

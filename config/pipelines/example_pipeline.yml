@@ -65,6 +65,6 @@ trainer:
 router:
   router_class: RatioRouter
   model_hub_name: llm_instruct
-  strength: 1.0
+  threshold: 1.0
 router_evaluator:
   batch_size: 4

@@ -50,7 +50,7 @@ class RouterDataset(BaseDataset):
                 "prompts": item["instruction"] + ". "+ item["input"]
                 }
             )
-        elif self.dataset_name == "custom_flr":
+        elif self.dataset_name == "custom":
             item = self.dataset[idx]
             item["prompts"]= item.pop("prompt")
         else:

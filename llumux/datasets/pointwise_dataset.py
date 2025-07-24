@@ -52,7 +52,7 @@ class PointwiseDataset(BaseDataset):
                 "models": item["candidates"][model_id]["model"]
             }
 
-        elif self.dataset_name == "custom_flr":
+        elif self.dataset_name == "custom":
             item = self.dataset[idx]
             available_models = list(item["candidates"].keys())
             model = np.random.choice(available_models).item()

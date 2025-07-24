@@ -3,9 +3,9 @@ workspace_path: ./workspace
 config_path: ./config
 model_hub_name: example_model_hub
 datasets:
-  - dataset_name: custom_flr
+  - dataset_name: custom
     dataset_class: PairwiseDataset
-    dataset_path: ./examples/flr_example_dataset
+    dataset_path: ./examples/llumux_example_dataset
     propietary: perf_scorer
     test_size: 0
     random_sample: False
@@ -14,9 +14,9 @@ datasets:
     splits:
       - train
       - validation
-  - dataset_name: custom_flr
+  - dataset_name: custom
     dataset_class: PairwiseDataset
-    dataset_path: ./examples/flr_example_dataset
+    dataset_path: ./examples/llumux_example_dataset
     propietary: cost_scorer
     test_size: 0
     random_sample: False
@@ -27,8 +27,8 @@ datasets:
     splits:
       - train
       - validation
-  - dataset_name: custom_flr
-    dataset_path: ./examples/flr_example_dataset
+  - dataset_name: custom
+    dataset_path: ./examples/llumux_example_dataset
     dataset_class: RouterDataset
     propietary: router
     test_size: 0.000
@@ -67,6 +67,6 @@ trainer:
 router:
   router_class: RatioRouter
   model_hub_name: example_model_hub
-  strength: 1.0
+  threshold: 1.0
 router_evaluator:
   batch_size: 4

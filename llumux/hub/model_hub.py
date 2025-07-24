@@ -6,7 +6,7 @@ from pathlib import Path
 class ModelHub:
     """Class to manage model hub configurations and model cards."""
     def __init__(self, model_hub_name: str = "llm_instruct"):
-        self.config_file = Path(os.environ["FLR_HOME"]) / "config" / "model_hubs" / f"{model_hub_name}.yml"
+        self.config_file = Path(os.environ["LLUMUX_HOME"]) / "config" / "model_hubs" / f"{model_hub_name}.yml"
 
         with open(self.config_file, "r") as f:
             self.model_info = yaml.safe_load(f)

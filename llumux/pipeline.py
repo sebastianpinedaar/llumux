@@ -33,12 +33,12 @@ class Pipeline:
         self.config_path = config.get("config_path", None)
 
         if self.workspace_path is None:
-            self.workspace_path = Path(os.environ.get("FLR_HOME", "")) / "workspace"
+            self.workspace_path = Path(os.environ.get("LLUMUX_HOME", "")) / "workspace"
         else:
             self.workspace_path = Path(self.workspace_path)
         
         if self.config_path is None:
-            self.config_path = Path(os.environ.get("FLR_HOME", "")) / "config"
+            self.config_path = Path(os.environ.get("LLUMUX_HOME", "")) / "config"
         else:
             self.config_path = Path(self.config_path)
 

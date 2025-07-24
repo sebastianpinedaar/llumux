@@ -2,10 +2,11 @@ from typing import Dict, List
 import torch
 import numpy as np
 
+from .base_router import BaseRouter
 from ..scorers.base_scorer import BaseScorer
 from ..hub.model_hub import ModelHub
 
-class RatioRouter:
+class RatioRouter(BaseRouter):
     """
     A router that uses the ratio of the scores from different scorers to make the final decision.
     The scorers might assess different aspects of the model such as
@@ -14,27 +15,25 @@ class RatioRouter:
     def __init__(self, 
                  scorers: Dict[str, BaseScorer],
                  model_hub: ModelHub,
-                 strength: float = 1,
+                 threshold: float = 1,
                  device: str = "cuda",
                  **kwargs):
         
-        assert len(scorers) == 2, "RatioRouter requires exactly two scorers: performance and complexity cost."
+        assert "perf_scorer" in scorers, "perf_scorer is required"
+        assert "cost_scorer" in scorers, "cost_scorer is required"
 
+        super().__init__(scorers, model_hub, threshold, **kwargs)
         self.perf_scorer = scorers["perf_scorer"].to(device)
         self.cost_scorer = scorers["cost_scorer"].to(device)
-        self.strength = strength
+        self.threshold = threshold
         self.kwargs = kwargs
         self.perf_scorer.eval()
         self.cost_scorer.eval()
-        self.model_hub = model_hub
-        self.model_size = np.array(
-                        self.model_hub.get_attributes_from_model_card("model_size")
-                        ).reshape(1, -1)
-        self.models = self.model_hub.get_models()
+
 
     def compute_assignment(self, cost_scorer_out, perf_scorer_out):
         prompt_complexity = cost_scorer_out * self.model_size
-        return perf_scorer_out / (prompt_complexity**self.strength)
+        return perf_scorer_out / (prompt_complexity**self.threshold)
     
     def compute_complexity(self, answer):
         return len(answer)

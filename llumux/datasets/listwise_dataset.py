@@ -61,7 +61,7 @@ class ListwiseDataset(BaseDataset):
                 "targets": target, \
                 "models": models
             }
-        elif self.dataset_name == "custom_flr":
+        elif self.dataset_name == "custom":
             item = self.dataset[idx]
             available_models = list(item["candidates"].keys())
             models = np.random.choice(available_models, self.list_size).tolist()

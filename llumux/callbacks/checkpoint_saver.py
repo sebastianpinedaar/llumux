@@ -24,7 +24,7 @@ class CheckpointSaver(BaseCallback):
             checkpoint_dir (str): Directory to save checkpoints.
         """
         if workspace_path is None:
-            workspace_path = Path(os.environ.get("FLR_HOME", "")) / "workspace"
+            workspace_path = Path(os.environ.get("LLUMUX_HOME", "")) / "workspace"
         self.workspace_path = Path(workspace_path) 
         self.freq = freq
         self.checkpoint_dir = checkpoint_dir

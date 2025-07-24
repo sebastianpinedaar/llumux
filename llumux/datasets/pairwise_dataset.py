@@ -61,7 +61,7 @@ class PairwiseDataset(BaseDataset):
                 "models_a": item["candidates"][model_a]["model"],
                 "models_b": item["candidates"][model_b]["model"]
             }
-        elif self.dataset_name == "custom_flr":
+        elif self.dataset_name == "custom":
             item = self.dataset[idx]
             available_models = list(item["candidates"].keys())
             models = np.random.choice(available_models, 2).tolist()

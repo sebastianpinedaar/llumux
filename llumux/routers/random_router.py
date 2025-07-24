@@ -19,6 +19,6 @@ class RandomRouter(ConstantRouter):
         
         super().__init__(default_model_id=0, **kwargs)
     
-    def route(self, prompt: str, model_list: List[str] = None):
-        selecte_models = np.random.choice(len(self.model_info), size=len(prompt), replace=True)
-        return selecte_models
+    def route(self, prompt: str):
+        selecte_models = np.random.choice(self.models, size=len(prompt), replace=True)
+        return selecte_models.tolist()
