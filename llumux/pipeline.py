@@ -151,7 +151,7 @@ class Pipeline:
             Router: The initialized router instance.
         """
         router_class = eval(router_class)
-        router = router_class(scorers, model_hub, **router_args)
+        router = router_class(scorers=scorers, model_hub=model_hub, **router_args)
         return router
 
     def train_scorer(self, scorer : BaseScorer, 

@@ -68,7 +68,7 @@ trainer:
   epochs: 1
   eval_freq : 5
 router:
-  router_class: RatioRouter
+  router_class: GreedyRouter
   model_hub_name: example_model_hub
   threshold: 1.0
 router_evaluator:
