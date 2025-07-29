@@ -81,7 +81,7 @@ You can adapt it to your own custome dataset, following a format as in the examp
 
 ---
 
-## 🧪 Create router composed of scorers
+## 🧪 Create Router as a Composed of Scorers
 
 Sometimes it is desiderable to select a model based on several criterias, i.e. based on the ouput of many scorers, where every scorer predicts a specific criteria. We can combine this scorers by defining our own router. We provide several examples of router classes, but these are easily extendible.
 
