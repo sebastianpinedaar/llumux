@@ -27,6 +27,8 @@ cd llumux
 pip install -e .
 ```
 
+The configurations and models are saved in a path specified by the environment variable `LLUMUX_HOME`.
+
 ---
 
 ## 🚀 Quick Start
